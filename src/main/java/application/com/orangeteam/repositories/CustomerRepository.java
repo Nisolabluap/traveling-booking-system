@@ -1,4 +1,9 @@
 package application.com.orangeteam.repositories;
 
-public class CustomerRepository {
+import application.com.orangeteam.models.entities.Customer;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
+
+@Repository
+public interface CustomerRepository extends JpaRepository<Customer, Long> {
 }
