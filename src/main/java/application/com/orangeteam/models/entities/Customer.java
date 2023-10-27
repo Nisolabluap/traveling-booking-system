@@ -19,7 +19,7 @@ public class Customer {
     private String lastName;
 
     @Column(name = "phone_number")
-    private String phoneNo;
+    private String phoneNumber;
 
     @Column(name = "email")
     private String email;

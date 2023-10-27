@@ -14,15 +14,11 @@ public interface TravelPackageRepository extends JpaRepository<TravelPackage, Lo
     @Query("SELECT tp FROM TravelPackage tp " +
             "WHERE tp.name = :name " +
             "AND tp.destination = :destination " +
-            "AND tp.description = :description " +
-            "AND tp.pricePerPerson = :pricePerPerson " +
             "AND tp.startingDate = :startingDate " +
             "AND tp.endingDate = :endingDate")
     TravelPackage findByAllFields(
             @Param("name") String name,
             @Param("destination") String destination,
-            @Param("description") String description,
-            @Param("pricePerPerson") double pricePerPerson,
             @Param("startingDate") LocalDate startingDate,
             @Param("endingDate") LocalDate endingDate
     );

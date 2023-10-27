@@ -30,36 +30,48 @@ public class TravelPackageServiceImpl implements TravelPackageService {
 
     @Override
     public TravelPackageDTO createTravelPackage(TravelPackageDTO packageDTO) {
+        // Check if a package with the same name, destination, starting date, and ending date already exists
         TravelPackage existingPackage = travelPackageRepository.findByAllFields(
                 packageDTO.getName(),
                 packageDTO.getDestination(),
-                packageDTO.getDescription(),
-                packageDTO.getPricePerPerson(),
                 packageDTO.getStartingDate(),
                 packageDTO.getEndingDate()
         );
 
         if (existingPackage != null) {
-            return convertToDTO(existingPackage);
+            // A similar package exists, check if both description and price are different
+            if (!existingPackage.getDescription().equals(packageDTO.getDescription()) &&
+                    existingPackage.getPricePerPerson() != packageDTO.getPricePerPerson()) {
+                // Both description and price are different, create a new package
+                return createNewTravelPackage(packageDTO);
+            } else {
+                // Either description or price (or both) are the same, return the existing package
+                return convertToDTO(existingPackage);
+            }
         } else {
-            LocalDate startDate = packageDTO.getStartingDate();
-            LocalDate endDate = packageDTO.getEndingDate();
-
-            if (endDate.isBefore(startDate) || endDate.isEqual(startDate)) {
-                throw new IllegalArgumentException("End date must be after the start date.");
-            }
-
-            int duration = Period.between(startDate, endDate).getDays();
-
-            if (duration <= 0) {
-                throw new IllegalArgumentException("Duration must be greater than 0.");
-            }
-
-            packageDTO.setDuration(duration);
-
-            TravelPackage savedPackage = travelPackageRepository.save(convertToEntity(packageDTO));
-            return convertToDTO(savedPackage);
+            // No similar package exists, create a new package
+            return createNewTravelPackage(packageDTO);
         }
+    }
+
+    private TravelPackageDTO createNewTravelPackage(TravelPackageDTO packageDTO) {
+        LocalDate startDate = packageDTO.getStartingDate();
+        LocalDate endDate = packageDTO.getEndingDate();
+
+        if (endDate.isBefore(startDate) || endDate.isEqual(startDate)) {
+            throw new IllegalArgumentException("End date must be after the start date.");
+        }
+
+        int duration = Period.between(startDate, endDate).getDays();
+
+        if (duration < 2) {
+            throw new  IllegalArgumentException("Duration must be greater than 1.");
+        }
+
+        packageDTO.setDuration(duration);
+
+        TravelPackage savedPackage = travelPackageRepository.save(convertToEntity(packageDTO));
+        return convertToDTO(savedPackage);
     }
 
     @Override

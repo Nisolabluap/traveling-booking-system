@@ -4,7 +4,6 @@ import application.com.orangeteam.models.dtos.CustomerDTO;
 import application.com.orangeteam.models.entities.Customer;
 import application.com.orangeteam.repositories.CustomerRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
-
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
@@ -59,11 +58,19 @@ public class CustomerServiceImpl implements CustomerService {
 
     @Override
     public Boolean deleteCustomer(Long id) {
-        Customer existongCustomer = customerRepository.findById(id).orElse(null);
         if (customerRepository.existsById(id)) {
             customerRepository.deleteById(id);
             return true;
         }
         return false;
+    }
+
+    @Override
+    public CustomerDTO getCustomerById(Long id) {
+        Customer existingCustomer = customerRepository.findById(id).orElse(null);
+        if (existingCustomer != null) {
+            return objectMapper.convertValue(existingCustomer, CustomerDTO.class);
+        }
+        return null;
     }
 }
