@@ -58,7 +58,6 @@ public class CustomerServiceImpl implements CustomerService {
 
     @Override
     public Boolean deleteCustomer(Long id) {
-        Customer existongCustomer = customerRepository.findById(id).orElse(null);
         if (customerRepository.existsById(id)) {
             customerRepository.deleteById(id);
             return true;

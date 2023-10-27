@@ -1,4 +1,4 @@
-package com.orangeteam.demo;
+package com.orangeteam;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
