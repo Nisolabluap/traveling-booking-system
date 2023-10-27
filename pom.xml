@@ -9,7 +9,7 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.orange-team</groupId>
-	<artifactId>demo</artifactId>
+	<artifactId>travel-booking-system</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>travelbookingsystem</name>
 	<description>Demo project for Spring Boot</description>
@@ -44,6 +44,26 @@
 			<groupId>org.postgresql</groupId>
 			<artifactId>postgresql</artifactId>
 			<version>42.6.0</version>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-mail</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.squareup.okhttp3</groupId>
+			<artifactId>okhttp</artifactId>
+			<version>4.10.0</version>
+		</dependency>
+		<dependency>
+			<groupId>com.mailslurp</groupId>
+			<artifactId>mailslurp-client-java</artifactId>
+			<version>LATEST</version>
+			<type>pom</type>
+		</dependency>
+		<dependency>
+			<groupId>com.mailslurp</groupId>
+			<artifactId>mailslurp-client-java</artifactId>
+			<version>15.17.4</version>
 		</dependency>
 	</dependencies>
 
