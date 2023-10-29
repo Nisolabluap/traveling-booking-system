@@ -1,4 +1,7 @@
 package application.com.orangeteam.services;
 
-public class PaymentService {
+import application.com.orangeteam.models.dtos.BookingDTO;
+
+public interface PaymentService {
+    boolean processPayment(BookingDTO bookingDTO);
 }
