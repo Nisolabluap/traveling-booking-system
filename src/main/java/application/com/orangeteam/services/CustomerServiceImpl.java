@@ -16,10 +16,12 @@ import java.util.stream.Collectors;
 public class CustomerServiceImpl implements CustomerService {
 
     private final CustomerRepository customerRepository;
+    private final EmailService emailService;
     private final ObjectMapper objectMapper;
 
-    public CustomerServiceImpl(CustomerRepository customerRepository, ObjectMapper objectMapper) {
+    public CustomerServiceImpl(CustomerRepository customerRepository, EmailService emailService, ObjectMapper objectMapper) {
         this.customerRepository = customerRepository;
+        this.emailService = emailService;
         this.objectMapper = objectMapper;
     }
 
@@ -29,8 +31,10 @@ public class CustomerServiceImpl implements CustomerService {
 
         Customer customerRepositoryEntity = customerRepository.save(customer);
         log.info("Created customer with id: {}", customerRepositoryEntity.getId());
+        CustomerDTO customerReturnDTO = objectMapper.convertValue(customerRepositoryEntity, CustomerDTO.class);
+        emailService.sendWelcomeEmail(customerReturnDTO);
 
-        return objectMapper.convertValue(customerRepositoryEntity, CustomerDTO.class);
+        return customerReturnDTO;
     }
 
     @Override
@@ -39,7 +43,7 @@ public class CustomerServiceImpl implements CustomerService {
 
         List<CustomerDTO> customerDTOS = customers.stream()
                 .map(customer -> objectMapper.convertValue(customer, CustomerDTO.class))
-                .collect(Collectors.toList());
+                .toList();
 
         return customerDTOS;
     }
