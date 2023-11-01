@@ -26,4 +26,6 @@ public class Customer {
     @Column(name = "email")
     private String email;
 
+    @OneToMany(mappedBy = "customer")
+    private List<Booking> bookings;
 }
