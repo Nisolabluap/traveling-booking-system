@@ -1,4 +1,4 @@
-package application.com.orangeteam.services.impl;
+package application.com.orangeteam.services;
 
 import application.com.orangeteam.models.dtos.TravelPackageDTO;
 import application.com.orangeteam.models.entities.TravelPackage;
