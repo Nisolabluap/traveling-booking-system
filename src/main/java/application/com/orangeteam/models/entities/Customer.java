@@ -2,9 +2,6 @@ package application.com.orangeteam.models.entities;
 
 import jakarta.persistence.*;
 import lombok.Data;
-import org.hibernate.validator.constraints.UniqueElements;
-
-import java.util.List;
 
 @Data
 @Entity
@@ -26,5 +23,4 @@ public class Customer {
 
     @Column(name = "email", unique = true)
     private String email;
-
 }
