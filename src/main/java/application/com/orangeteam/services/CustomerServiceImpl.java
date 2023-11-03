@@ -26,7 +26,6 @@ public class CustomerServiceImpl implements CustomerService {
     @Override
     public CustomerDTO createCustomer(CustomerDTO customerDTO) {
         Customer customer = objectMapper.convertValue(customerDTO, Customer.class);
-
         Customer customerRepositoryEntity = customerRepository.save(customer);
         log.info("Created customer with id: {}", customerRepositoryEntity.getId());
 
