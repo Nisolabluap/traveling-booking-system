@@ -7,6 +7,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @Repository
 public interface TravelPackageRepository extends JpaRepository<TravelPackage, Long> {
@@ -22,4 +23,6 @@ public interface TravelPackageRepository extends JpaRepository<TravelPackage, Lo
             @Param("startingDate") LocalDate startingDate,
             @Param("endingDate") LocalDate endingDate
     );
+
+    List<TravelPackage> findByDestination(String destination);
 }

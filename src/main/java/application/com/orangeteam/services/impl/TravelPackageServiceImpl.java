@@ -4,6 +4,7 @@ import application.com.orangeteam.models.dtos.TravelPackageDTO;
 import application.com.orangeteam.models.entities.TravelPackage;
 import application.com.orangeteam.repositories.TravelPackageRepository;
 import application.com.orangeteam.services.TravelPackageService;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,6 +12,8 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.Period;
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -19,6 +22,8 @@ import java.util.stream.Collectors;
 public class TravelPackageServiceImpl implements TravelPackageService {
     @Autowired
     private TravelPackageRepository travelPackageRepository;
+    @Autowired
+    private ObjectMapper objectMapper;
 
     @Override
     public List<TravelPackageDTO> getAllTravelPackages() {
@@ -65,7 +70,7 @@ public class TravelPackageServiceImpl implements TravelPackageService {
         int duration = Period.between(startDate, endDate).getDays();
 
         if (duration < 2) {
-            throw new  IllegalArgumentException("Duration must be greater than 1.");
+            throw new IllegalArgumentException("Duration must be greater than 1.");
         }
 
         packageDTO.setDuration(duration);
@@ -124,5 +129,56 @@ public class TravelPackageServiceImpl implements TravelPackageService {
         TravelPackage travelPackage = new TravelPackage();
         BeanUtils.copyProperties(packageDTO, travelPackage);
         return travelPackage;
+    }
+
+    @Override
+    public List<TravelPackageDTO> getTravelPackageBetweenDates(LocalDate startingDate, LocalDate endingDate, boolean ascending) {
+        List<TravelPackage> allPackages = travelPackageRepository.findAll();
+
+        List<TravelPackage> filteredPackages = allPackages.stream()
+                .filter(travelPackage -> travelPackage.getStartingDate().isAfter(startingDate) && travelPackage.getEndingDate().isBefore(endingDate))
+                .collect(Collectors.toList());
+
+        //sorting dates
+        if (ascending) {
+            filteredPackages.sort(Comparator.comparing(TravelPackage::getStartingDate));
+        } else {
+            filteredPackages.sort(Comparator.comparing(TravelPackage::getStartingDate).reversed());
+        }
+
+        List<TravelPackageDTO> filteredPackagesDTO = new ArrayList<>();
+        for (TravelPackage travelPackage : filteredPackages) {
+            filteredPackagesDTO.add(objectMapper.convertValue(travelPackage, TravelPackageDTO.class));
+
+        }
+        return filteredPackagesDTO;
+    }
+
+    @Override
+    public List<TravelPackageDTO> getTravelPackageWithPriceBetweenTwoValues(double minPrice, double maxPrice) {
+        List<TravelPackage> allPackages = travelPackageRepository.findAll();
+        List<TravelPackageDTO> travelPackagesPriceDTOs = new ArrayList<>();
+        for (TravelPackage travelPackage : allPackages) {
+            if(travelPackage.getPricePerPerson()> minPrice && travelPackage.getPricePerPerson() <= maxPrice){
+                travelPackagesPriceDTOs.add(objectMapper.convertValue(travelPackage, TravelPackageDTO.class));
+            }
+        }
+        return travelPackagesPriceDTOs;
+    }
+
+    @Override
+    public List<TravelPackageDTO> getTravelPackageByDestination(String destination) {
+        List<TravelPackage> travelPackages = travelPackageRepository.findByDestination(destination);
+
+        if (travelPackages.isEmpty()) {
+            throw new EntityNotFoundException("No travel packages found for destination: " + destination);
+        }
+
+        List<TravelPackageDTO> travelPackageDTOs = new ArrayList<>();
+        for (TravelPackage travelPackage : travelPackages) {
+            travelPackageDTOs.add(convertToDTO(travelPackage));
+        }
+
+        return travelPackageDTOs;
     }
 }
