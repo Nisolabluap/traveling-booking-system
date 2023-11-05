@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.Data;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @Entity
 @Data
@@ -29,4 +30,6 @@ public class TravelPackage {
     private LocalDate startingDate;
     @Column(name = "ending_date")
     private LocalDate endingDate;
+    @OneToMany(mappedBy = "travelPackage")
+    private List<Booking> bookings;
 }
