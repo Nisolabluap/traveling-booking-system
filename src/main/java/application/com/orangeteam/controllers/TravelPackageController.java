@@ -49,7 +49,6 @@ public class TravelPackageController {
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startingDate,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endingDate,
             @RequestParam(defaultValue = "true") boolean ascending) {
-
         return ResponseEntity.ok(travelPackageService.getTravelPackageBetweenDates(startingDate, endingDate, ascending));
     }
 
