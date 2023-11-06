@@ -3,12 +3,15 @@ package application.com.orangeteam.services;
 import application.com.orangeteam.models.dtos.BookingDTO;
 import application.com.orangeteam.models.entities.Booking;
 import application.com.orangeteam.models.entities.Customer;
+import application.com.orangeteam.models.entities.Destination;
 import application.com.orangeteam.models.entities.TravelPackage;
 import application.com.orangeteam.repositories.BookingRepository;
 import application.com.orangeteam.repositories.CustomerRepository;
 import application.com.orangeteam.repositories.TravelPackageRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 public class BookingServiceImpl implements BookingService {
@@ -48,5 +51,26 @@ public class BookingServiceImpl implements BookingService {
         public DuplicateBookingException(String message) {
             super(message);
         }
+    }
+
+    @Override
+    public List<Booking> getBookingsByCustomer(Long customerId) {
+        return bookingRepository.findByCustomer(new Customer());
+    }
+
+    @Override
+    public List<Booking> getBookingsByTravelPackage(Long travelPackageId) {
+        TravelPackage travelPackage = new TravelPackage();
+        travelPackage.setId(travelPackageId);
+        return bookingRepository.findByTravelPackage(travelPackage);
+    }
+    @Override
+    public List<Booking> getBookingsByDestination(Long destinationId){
+        Destination destination = new Destination();
+        List<Booking> bookings = bookingRepository.findByDestination(destination);
+       destination.setId(destinationId);
+
+       return bookingRepository.findByDestination(destination);
+
     }
 }
