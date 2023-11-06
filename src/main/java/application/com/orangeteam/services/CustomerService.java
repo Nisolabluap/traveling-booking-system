@@ -12,7 +12,7 @@ public interface CustomerService {
 
     CustomerDTO updateCustomer(Long id, CustomerDTO customerDTO);
 
-    Boolean deleteCustomer(Long id);
+    void deleteCustomer(Long id);
 
     CustomerDTO getCustomerById(Long id);
 }

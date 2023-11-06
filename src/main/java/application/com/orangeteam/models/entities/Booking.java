@@ -10,15 +10,15 @@ public class Booking {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
-    @PrimaryKeyJoinColumn(name = "customer")
-    @OneToOne()
+    @ManyToOne
+    @JoinColumn(name = "customer_id", nullable = false)
     Customer customer;
-    @PrimaryKeyJoinColumn(name = "travel_package")
-    @OneToOne()
+    @ManyToOne
+    @JoinColumn(name = "travel_package_id", nullable = false)
     TravelPackage travelPackage;
-    @PrimaryKeyJoinColumn(name = "payment")
-    @OneToOne()
-    Payment payment;
+    /*@PrimaryKeyJoinColumn(name = "payment")
+    @OneToOne
+    Payment payment;*/
     @Column(name = "num_travelers")
     int numTravelers;
 }

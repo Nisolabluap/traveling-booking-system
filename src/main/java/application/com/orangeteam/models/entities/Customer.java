@@ -23,7 +23,9 @@ public class Customer {
     @Column(name = "phone_number")
     private String phoneNumber;
 
-    @Column(name = "email")
+    @Column(name = "email", unique = true)
     private String email;
 
+    @OneToMany(mappedBy = "customer")
+    private List<Booking> bookings;
 }
