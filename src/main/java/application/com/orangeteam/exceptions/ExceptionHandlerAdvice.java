@@ -43,6 +43,16 @@ public class ExceptionHandlerAdvice {
         return new ResponseEntity<>(objectToString(Map.of("message", travelPackageCreateException.getMessage())), BAD_REQUEST);
     }
 
+    @ExceptionHandler(BookingCreateException.class)
+    public ResponseEntity<String> bookingCreateException(BookingCreateException bookingCreateException) {
+        return new ResponseEntity<>(objectToString(Map.of("message", bookingCreateException.getMessage())), BAD_REQUEST);
+    }
+
+    @ExceptionHandler(DuplicateBookingException.class)
+    public ResponseEntity<String> duplicateBookingException(DuplicateBookingException duplicateBookingException) {
+        return new ResponseEntity<>(objectToString(Map.of("message", duplicateBookingException.getMessage())), CONFLICT);
+    }
+
     private String objectToString(Object response) {
         try {
             return objectMapper.writeValueAsString(response);
