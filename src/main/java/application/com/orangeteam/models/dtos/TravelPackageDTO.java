@@ -21,6 +21,10 @@ public class TravelPackageDTO {
     @NotEmpty(message = "This field must not be empty!")
     private String description;
 
+    @NotEmpty(message = "This field must not be empty")
+    @Min(value = 0, message = "Available reservations must be greater than or equal to 0")
+    private int availableReservations;
+
     private int duration;
 
     @NotNull(message = "Price must not be null")

@@ -1,17 +1,17 @@
 package application.com.orangeteam.services;
 
+import application.com.orangeteam.exceptions.DuplicateTravelPackageException;
+import application.com.orangeteam.exceptions.TravelPackageCreateException;
 import application.com.orangeteam.models.dtos.TravelPackageDTO;
 import application.com.orangeteam.models.entities.TravelPackage;
 import application.com.orangeteam.repositories.TravelPackageRepository;
-import application.com.orangeteam.services.TravelPackageService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.persistence.EntityNotFoundException;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
-import java.time.Period;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -20,83 +20,59 @@ import java.util.stream.Collectors;
 
 @Service
 public class TravelPackageServiceImpl implements TravelPackageService {
-    @Autowired
-    private TravelPackageRepository travelPackageRepository;
-    @Autowired
-    private ObjectMapper objectMapper;
+
+    private final TravelPackageRepository travelPackageRepository;
+    private final ObjectMapper objectMapper;
+
+    public TravelPackageServiceImpl(TravelPackageRepository travelPackageRepository, ObjectMapper objectMapper) {
+        this.travelPackageRepository = travelPackageRepository;
+        this.objectMapper = objectMapper;
+    }
+
+    @NotNull
+    private static TravelPackage updateTravelPackageInfo(TravelPackageDTO packageDTO, TravelPackage existingPackage) {
+        existingPackage.setName(packageDTO.getName());
+        existingPackage.setDestination(packageDTO.getDestination());
+        existingPackage.setDescription(packageDTO.getDescription());
+        existingPackage.setPricePerPerson(packageDTO.getPricePerPerson());
+        existingPackage.setStartingDate(packageDTO.getStartingDate());
+        existingPackage.setEndingDate(packageDTO.getEndingDate());
+        existingPackage.setAvailableReservations(packageDTO.getAvailableReservations());
+        return existingPackage;
+    }
 
     @Override
     public List<TravelPackageDTO> getAllTravelPackages() {
         List<TravelPackage> packages = travelPackageRepository.findAll();
         return packages.stream()
                 .map(this::convertToDTO)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     @Override
     public TravelPackageDTO createTravelPackage(TravelPackageDTO packageDTO) {
-        // Check if a package with the same name, destination, starting date, and ending date already exists
-        TravelPackage existingPackage = travelPackageRepository.findByAllFields(
-                packageDTO.getName(),
-                packageDTO.getDestination(),
-                packageDTO.getStartingDate(),
-                packageDTO.getEndingDate()
-        );
-
-        if (existingPackage != null) {
-            // A similar package exists, check if both description and price are different
-            if (!existingPackage.getDescription().equals(packageDTO.getDescription()) &&
-                    existingPackage.getPricePerPerson() != packageDTO.getPricePerPerson()) {
-                // Both description and price are different, create a new package
-                return createNewTravelPackage(packageDTO);
-            } else {
-                // Either description or price (or both) are the same, return the existing package
-                return convertToDTO(existingPackage);
-            }
-        } else {
-            // No similar package exists, create a new package
-            return createNewTravelPackage(packageDTO);
+        if (!isValid(packageDTO)) {
+            throw new TravelPackageCreateException("Invalid dates");
         }
-    }
-
-    private TravelPackageDTO createNewTravelPackage(TravelPackageDTO packageDTO) {
-        LocalDate startDate = packageDTO.getStartingDate();
-        LocalDate endDate = packageDTO.getEndingDate();
-
-        if (endDate.isBefore(startDate) || endDate.isEqual(startDate)) {
-            throw new IllegalArgumentException("End date must be after the start date.");
+        if (isDuplicate(packageDTO)) {
+            throw new DuplicateTravelPackageException("Travel package already exists");
         }
-
-        int duration = Period.between(startDate, endDate).getDays();
-
-        if (duration < 2) {
-            throw new IllegalArgumentException("Duration must be greater than 1.");
-        }
-
-        packageDTO.setDuration(duration);
-
         TravelPackage savedPackage = travelPackageRepository.save(convertToEntity(packageDTO));
+
         return convertToDTO(savedPackage);
     }
 
     @Override
     public TravelPackageDTO updateTravelPackage(Long id, TravelPackageDTO packageDTO) {
+        if (!isValid(packageDTO)) {
+            throw new TravelPackageCreateException("Invalid dates");
+        }
+
         Optional<TravelPackage> existingPackageOptional = travelPackageRepository.findById(id);
-
         if (existingPackageOptional.isPresent()) {
-            TravelPackage existingPackage = existingPackageOptional.get();
-            LocalDate startDate = packageDTO.getStartingDate();
-            LocalDate endDate = packageDTO.getEndingDate();
-            int duration = Period.between(startDate, endDate).getDays();
-
-            existingPackage.setName(packageDTO.getName());
-            existingPackage.setDestination(packageDTO.getDestination());
-            existingPackage.setDescription(packageDTO.getDescription());
-            existingPackage.setPricePerPerson(packageDTO.getPricePerPerson());
-            existingPackage.setStartingDate(packageDTO.getStartingDate());
-            existingPackage.setEndingDate(packageDTO.getEndingDate());
-
+            TravelPackage existingPackage = updateTravelPackageInfo(packageDTO, existingPackageOptional.get());
             TravelPackage updatedPackage = travelPackageRepository.save(existingPackage);
+
             return convertToDTO(updatedPackage);
         } else {
             throw new EntityNotFoundException("Travel package with ID " + id + " not found");
@@ -159,7 +135,7 @@ public class TravelPackageServiceImpl implements TravelPackageService {
         List<TravelPackage> allPackages = travelPackageRepository.findAll();
         List<TravelPackageDTO> travelPackagesPriceDTOs = new ArrayList<>();
         for (TravelPackage travelPackage : allPackages) {
-            if(travelPackage.getPricePerPerson()> minPrice && travelPackage.getPricePerPerson() <= maxPrice){
+            if (travelPackage.getPricePerPerson() > minPrice && travelPackage.getPricePerPerson() <= maxPrice) {
                 travelPackagesPriceDTOs.add(objectMapper.convertValue(travelPackage, TravelPackageDTO.class));
             }
         }
@@ -180,5 +156,22 @@ public class TravelPackageServiceImpl implements TravelPackageService {
         }
 
         return travelPackageDTOs;
+    }
+
+    private boolean isValid(TravelPackageDTO travelPackageDTO) {
+        return travelPackageDTO.getStartingDate().isAfter(LocalDate.now()) &&
+                travelPackageDTO.getStartingDate().plusDays(2).isBefore(travelPackageDTO.getEndingDate());
+    }
+
+    private boolean isDuplicate(TravelPackageDTO travelPackageDTO) {
+        TravelPackage existingPackage = travelPackageRepository.findByAllFields(
+                travelPackageDTO.getName(),
+                travelPackageDTO.getDestination(),
+                travelPackageDTO.getDescription(),
+                travelPackageDTO.getStartingDate(),
+                travelPackageDTO.getEndingDate()
+        );
+
+        return existingPackage != null;
     }
 }

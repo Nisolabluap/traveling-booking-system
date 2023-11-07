@@ -1,7 +1,6 @@
 package application.com.orangeteam.controllers;
 
 import application.com.orangeteam.models.dtos.TravelPackageDTO;
-import application.com.orangeteam.models.entities.TravelPackage;
 import application.com.orangeteam.services.TravelPackageService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -101,5 +100,4 @@ public class TravelPackageController {
             return ResponseEntity.notFound().build();
         }
     }
-
 }
