@@ -1,16 +1,17 @@
 package application.com.orangeteam.services;
 
+import application.com.orangeteam.exceptions.CustomerNotFoundException;
 import application.com.orangeteam.models.dtos.BookingDTO;
 import application.com.orangeteam.models.entities.Booking;
 import application.com.orangeteam.models.entities.Customer;
-import application.com.orangeteam.models.entities.Destination;
 import application.com.orangeteam.models.entities.TravelPackage;
 import application.com.orangeteam.repositories.BookingRepository;
 import application.com.orangeteam.repositories.CustomerRepository;
 import application.com.orangeteam.repositories.TravelPackageRepository;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -18,13 +19,11 @@ public class BookingServiceImpl implements BookingService {
 
     private final CustomerRepository customerRepository;
     private final TravelPackageRepository travelPackageRepository;
-    private final ObjectMapper objectMapper;
     private final BookingRepository bookingRepository;
 
-    public BookingServiceImpl(CustomerRepository customerRepository, TravelPackageRepository travelPackageRepository, ObjectMapper objectMapper, BookingRepository bookingRepository) {
+    public BookingServiceImpl(CustomerRepository customerRepository, TravelPackageRepository travelPackageRepository, BookingRepository bookingRepository) {
         this.customerRepository = customerRepository;
         this.travelPackageRepository = travelPackageRepository;
-        this.objectMapper = objectMapper;
         this.bookingRepository = bookingRepository;
     }
 
@@ -54,23 +53,41 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
-    public List<Booking> getBookingsByCustomer(Long customerId) {
-        return bookingRepository.findByCustomer(new Customer());
+    public List<BookingDTO> getBookingsByCustomer(Long customerId) {
+        List<Booking> bookingEntityList = bookingRepository.findByCustomer(customerRepository.findById(customerId)
+                .orElseThrow(() -> new CustomerNotFoundException("Cannot find customer with " + customerId)));
+        return getBookingDTOS(bookingEntityList);
+    }
+
+    @NotNull
+    private static List<BookingDTO> getBookingDTOS(List<Booking> bookingEntityList) {
+        List<BookingDTO> bookingDTOList = new ArrayList<>();
+
+        for (Booking bookingEntity : bookingEntityList) {
+            BookingDTO bookingDTO = new BookingDTO();
+            bookingDTO.setId(bookingEntity.getId());
+            bookingDTO.setCustomerID(bookingEntity.getCustomer().getId());
+            bookingDTO.setTravelPackageID(bookingEntity.getTravelPackage().getId());
+            bookingDTO.setNumTravelers(bookingEntity.getNumTravelers());
+            bookingDTOList.add(bookingDTO);
+        }
+        return bookingDTOList;
     }
 
     @Override
-    public List<Booking> getBookingsByTravelPackage(Long travelPackageId) {
-        TravelPackage travelPackage = new TravelPackage();
-        travelPackage.setId(travelPackageId);
-        return bookingRepository.findByTravelPackage(travelPackage);
+    public List<BookingDTO> getBookingsByTravelPackage(Long travelPackageId) {
+        List<Booking> bookingEntityList = bookingRepository.findByTravelPackage(travelPackageRepository.findById(travelPackageId)
+                .orElseThrow(() -> new RuntimeException("Cannot find travel package with id " + travelPackageId)));
+        return getBookingDTOS(bookingEntityList);
     }
     @Override
-    public List<Booking> getBookingsByDestination(Long destinationId){
-        Destination destination = new Destination();
-        List<Booking> bookings = bookingRepository.findByDestination(destination);
-       destination.setId(destinationId);
-
-       return bookingRepository.findByDestination(destination);
-
+    public List<BookingDTO> getBookingsByDestination(String destination){
+        List<TravelPackage> travelPackages = travelPackageRepository.findByDestination(destination);
+        List<Booking> allBookingsWithDestination = new ArrayList<>();
+        for (TravelPackage travelPackage : travelPackages) {
+            List<Booking> bookingsWithTravelPackage = bookingRepository.findByTravelPackage(travelPackage);
+            allBookingsWithDestination.addAll(bookingsWithTravelPackage);
+        }
+       return getBookingDTOS(allBookingsWithDestination);
     }
 }

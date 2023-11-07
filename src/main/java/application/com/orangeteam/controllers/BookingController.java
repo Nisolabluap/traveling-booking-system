@@ -1,8 +1,6 @@
 package application.com.orangeteam.controllers;
 
 import application.com.orangeteam.models.dtos.BookingDTO;
-import application.com.orangeteam.models.entities.Booking;
-import application.com.orangeteam.models.entities.Destination;
 import application.com.orangeteam.services.BookingService;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
@@ -26,23 +24,21 @@ public class BookingController {
         return ResponseEntity.ok(bookingService.createBooking(bookingDTO));
     }
 
-    @GetMapping("/api/bookings/customer")
-    public ResponseEntity<List<Booking>> getBookingsByCustomer(@Valid @RequestBody BookingDTO bookingDTO) {
-        Long customerId = bookingDTO.getCustomerID();
-        List<Booking> bookings = bookingService.getBookingsByCustomer(customerId);
-        return ResponseEntity.ok(bookings);
+    @GetMapping(params = "customerID")
+    public ResponseEntity<List<BookingDTO>> getBookingsByCustomer(@RequestParam Long customerID) {
+        List<BookingDTO> bookingDTOLists = bookingService.getBookingsByCustomer(customerID);
+        return ResponseEntity.ok(bookingDTOLists);
     }
 
-    @GetMapping("/api/bookings/customer/travelpackage")
-    public ResponseEntity<List<Booking>> getBookingByTravelPackage(@Valid @RequestBody BookingDTO bookingDTO) {
-        Long travelPackageId = bookingDTO.getTravelPackageID();
-        List<Booking> bookings = bookingService.getBookingsByTravelPackage(travelPackageId);
-
-        return ResponseEntity.ok(bookings);
+    @GetMapping(params = "travelPackageID")
+    public ResponseEntity<List<BookingDTO>> getBookingByTravelPackage(@RequestParam Long travelPackageID) {
+        List<BookingDTO> bookingDTOLists = bookingService.getBookingsByTravelPackage(travelPackageID);
+        return ResponseEntity.ok(bookingDTOLists);
     }
 
-    @RequestMapping(name = "api/bookings/customer/destination")
-    Long destinationId = BookingDTO();
-    List<Booking> bookings = bookingService.getBookingsByDestination(destinationId);
-
+    @GetMapping(params = "destination")
+    public ResponseEntity<List<BookingDTO>> getBookingsByDestination(@RequestParam String destination) {
+        List<BookingDTO> bookingDTOList = bookingService.getBookingsByDestination(destination);
+        return ResponseEntity.ok(bookingDTOList);
+    }
 }
