@@ -43,6 +43,11 @@ public class ExceptionHandlerAdvice {
         return new ResponseEntity<>(objectToString(Map.of("message", travelPackageCreateException.getMessage())), BAD_REQUEST);
     }
 
+    @ExceptionHandler(TravelPackageNotFoundException.class)
+    public ResponseEntity<String> travelPackageNotFoundException(TravelPackageNotFoundException travelPackageNotFoundException) {
+        return new ResponseEntity<>(objectToString(Map.of("message", travelPackageNotFoundException.getMessage())), NOT_FOUND);
+    }
+
     @ExceptionHandler(BookingCreateException.class)
     public ResponseEntity<String> bookingCreateException(BookingCreateException bookingCreateException) {
         return new ResponseEntity<>(objectToString(Map.of("message", bookingCreateException.getMessage())), BAD_REQUEST);

@@ -1,7 +1,9 @@
 package application.com.orangeteam.services;
 
 import application.com.orangeteam.exceptions.BookingCreateException;
+import application.com.orangeteam.exceptions.CustomerNotFoundException;
 import application.com.orangeteam.exceptions.DuplicateBookingException;
+import application.com.orangeteam.exceptions.TravelPackageNotFoundException;
 import application.com.orangeteam.models.dtos.BookingDTO;
 import application.com.orangeteam.models.entities.Booking;
 import application.com.orangeteam.models.entities.Customer;
@@ -33,12 +35,16 @@ public class BookingServiceImpl implements BookingService {
             throw new BookingCreateException("Number of travelers exceeds available reservations");
         }
 
-        TravelPackage travelPackage = travelPackageRepository.getReferenceById(bookingDTO.getTravelPackageID());
+        TravelPackage travelPackage = travelPackageRepository.findById(bookingDTO.getTravelPackageID())
+                .orElseThrow(() -> new TravelPackageNotFoundException("Invalid travel package ID"));
+        Customer customer = customerRepository.findById(bookingDTO.getCustomerID())
+                        .orElseThrow(() -> new CustomerNotFoundException("Invalid customer id."));
+
         travelPackage.setAvailableReservations(travelPackage.getAvailableReservations() - bookingDTO.getNumTravelers());
         travelPackageRepository.save(travelPackage);
 
         Booking booking = new Booking();
-        booking.setCustomer(customerRepository.getReferenceById(bookingDTO.getCustomerID()));
+        booking.setCustomer(customer);
         booking.setTravelPackage(travelPackage);
         booking.setNumTravelers(bookingDTO.getNumTravelers());
         Booking bookingEntity = bookingRepository.save(booking);
