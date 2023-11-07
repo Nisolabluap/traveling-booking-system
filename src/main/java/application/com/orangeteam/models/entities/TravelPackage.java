@@ -28,8 +28,12 @@ public class TravelPackage {
 
     @Column(name = "starting_date")
     private LocalDate startingDate;
+
     @Column(name = "ending_date")
     private LocalDate endingDate;
+
+    @Column(name = "available_reservations")
+    private int availableReservations;
     @OneToMany(mappedBy = "travelPackage")
     private List<Booking> bookings;
 }

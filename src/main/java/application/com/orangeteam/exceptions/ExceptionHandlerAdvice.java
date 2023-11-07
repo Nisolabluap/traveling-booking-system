@@ -9,8 +9,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 
 import java.util.Map;
 
-import static org.springframework.http.HttpStatus.BAD_REQUEST;
-import static org.springframework.http.HttpStatus.NOT_FOUND;
+import static org.springframework.http.HttpStatus.*;
 
 @Slf4j
 @ControllerAdvice
@@ -32,6 +31,16 @@ public class ExceptionHandlerAdvice {
     public ResponseEntity<String> customerCreateException(CustomerCreateException customerCreateException){
         return new ResponseEntity<>(objectToString(
                 Map.of("message", customerCreateException.getMessage())), BAD_REQUEST);
+    }
+
+    @ExceptionHandler(DuplicateTravelPackageException.class)
+    public ResponseEntity<String> duplicateTravelPackageException(DuplicateTravelPackageException  duplicateTravelPackageException) {
+        return new ResponseEntity<>(objectToString(Map.of("message", duplicateTravelPackageException.getMessage())), CONFLICT);
+    }
+
+    @ExceptionHandler(TravelPackageCreateException.class)
+    public ResponseEntity<String> travelPackageCreateException(TravelPackageCreateException travelPackageCreateException) {
+        return new ResponseEntity<>(objectToString(Map.of("message", travelPackageCreateException.getMessage())), BAD_REQUEST);
     }
 
     private String objectToString(Object response) {
