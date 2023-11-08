@@ -1,5 +1,9 @@
 package application.com.orangeteam.services;
 
+import application.com.orangeteam.exceptions.BookingCreateException;
+import application.com.orangeteam.exceptions.CustomerNotFoundException;
+import application.com.orangeteam.exceptions.DuplicateBookingException;
+import application.com.orangeteam.exceptions.TravelPackageNotFoundException;
 import application.com.orangeteam.models.dtos.BookingDTO;
 import application.com.orangeteam.models.entities.Booking;
 import application.com.orangeteam.models.entities.Customer;
@@ -7,7 +11,7 @@ import application.com.orangeteam.models.entities.TravelPackage;
 import application.com.orangeteam.repositories.BookingRepository;
 import application.com.orangeteam.repositories.CustomerRepository;
 import application.com.orangeteam.repositories.TravelPackageRepository;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.validation.constraints.NotNull;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -18,13 +22,11 @@ public class BookingServiceImpl implements BookingService {
 
     private final CustomerRepository customerRepository;
     private final TravelPackageRepository travelPackageRepository;
-    private final ObjectMapper objectMapper;
     private final BookingRepository bookingRepository;
 
     public BookingServiceImpl(CustomerRepository customerRepository, TravelPackageRepository travelPackageRepository, BookingRepository bookingRepository) {
         this.customerRepository = customerRepository;
         this.travelPackageRepository = travelPackageRepository;
-        this.objectMapper = objectMapper;
         this.bookingRepository = bookingRepository;
     }
 
