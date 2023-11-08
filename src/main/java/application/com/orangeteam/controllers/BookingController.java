@@ -5,16 +5,15 @@ import application.com.orangeteam.services.BookingService;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @Validated
 @RequestMapping("/api/bookings")
 public class BookingController {
-    private final BookingService bookingService;
+    private BookingService bookingService;
 
     public BookingController(BookingService bookingService) {
         this.bookingService = bookingService;
@@ -23,5 +22,23 @@ public class BookingController {
     @PostMapping
     public ResponseEntity<BookingDTO> createBooking(@RequestBody @Valid BookingDTO bookingDTO) {
         return ResponseEntity.ok(bookingService.createBooking(bookingDTO));
+    }
+
+    @GetMapping(params = "customerID")
+    public ResponseEntity<List<BookingDTO>> getBookingsByCustomer(@RequestParam Long customerID) {
+        List<BookingDTO> bookingDTOLists = bookingService.getBookingsByCustomer(customerID);
+        return ResponseEntity.ok(bookingDTOLists);
+    }
+
+    @GetMapping(params = "travelPackageID")
+    public ResponseEntity<List<BookingDTO>> getBookingByTravelPackage(@RequestParam Long travelPackageID) {
+        List<BookingDTO> bookingDTOLists = bookingService.getBookingsByTravelPackage(travelPackageID);
+        return ResponseEntity.ok(bookingDTOLists);
+    }
+
+    @GetMapping(params = "destination")
+    public ResponseEntity<List<BookingDTO>> getBookingsByDestination(@RequestParam String destination) {
+        List<BookingDTO> bookingDTOList = bookingService.getBookingsByDestination(destination);
+        return ResponseEntity.ok(bookingDTOList);
     }
 }

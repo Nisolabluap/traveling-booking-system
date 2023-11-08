@@ -8,4 +8,5 @@ public class BookingDTO {
     private long customerID;
     private long travelPackageID;
     private int numTravelers;
+
 }
