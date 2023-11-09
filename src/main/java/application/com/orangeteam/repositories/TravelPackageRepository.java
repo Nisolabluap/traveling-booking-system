@@ -27,4 +27,6 @@ public interface TravelPackageRepository extends JpaRepository<TravelPackage, Lo
     );
 
     List<TravelPackage> findByDestination(String destination);
+    List<TravelPackage> findByPricePerPersonBetween(double minPrice, double maxPrice);
+
 }
