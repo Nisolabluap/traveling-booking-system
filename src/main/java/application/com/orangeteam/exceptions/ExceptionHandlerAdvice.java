@@ -58,6 +58,16 @@ public class ExceptionHandlerAdvice {
         return new ResponseEntity<>(objectToString(Map.of("message", duplicateBookingException.getMessage())), CONFLICT);
     }
 
+    @ExceptionHandler(InvalidEmailFormatException.class)
+    public ResponseEntity<String> invalidEmailFormatException(InvalidEmailFormatException invalidEmailFormatException) {
+        return new ResponseEntity<>(objectToString(Map.of("message", invalidEmailFormatException.getMessage())), CONFLICT);
+    }
+
+    @ExceptionHandler(InvalidPhoneFormatException.class)
+    public ResponseEntity<String> invalidPhoneFormatException(InvalidPhoneFormatException invalidPhoneFormatException) {
+        return new ResponseEntity<>(objectToString(Map.of("message", invalidPhoneFormatException.getMessage())), CONFLICT);
+    }
+
     private String objectToString(Object response) {
         try {
             return objectMapper.writeValueAsString(response);

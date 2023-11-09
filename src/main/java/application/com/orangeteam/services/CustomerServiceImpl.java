@@ -28,30 +28,48 @@ public class CustomerServiceImpl implements CustomerService {
         this.objectMapper = objectMapper;
     }
 
-    @Override
-    public CustomerDTO createCustomer(CustomerDTO customerDTO) {
-        Customer customer = objectMapper.convertValue(customerDTO, Customer.class);
-
-        String phoneNumber = customer.getPhoneNumber();
+    private void validateCustomerDto(CustomerDTO customerDTO) {
+        String phoneNumber = customerDTO.getPhoneNumber();
+        String email = customerDTO.getEmail();
 
         if (!phoneNumber.matches("^(\\+4|)?(07[0-8]{1}[0-9]{1}|02[0-9]{2}|03[0-9]{2}){1}?(\\s|\\.|\\-)?([0-9]{3}(\\s|\\.|\\-|)){2}$")) {
             throw new InvalidPhoneFormatException("Phone number format invalid.");
         }
 
-        String email = customer.getEmail();
-
         if (!email.matches("^[A-Za-z0-9+_.-]+@(.+)$")) {
             throw new InvalidEmailFormatException("Email format invalid.");
         }
+    }
+
+    @Override
+    public CustomerDTO createCustomer(CustomerDTO customerDTO) {
+        validateCustomerDto(customerDTO);
+
+        Customer customer = objectMapper.convertValue(customerDTO, Customer.class);
 
         try {
             Customer customerRepositoryEntity = customerRepository.save(customer);
             log.info("Created customer with id: {}", customerRepositoryEntity.getId());
             return objectMapper.convertValue(customerRepositoryEntity, CustomerDTO.class);
         } catch (DataIntegrityViolationException exception) {
-            log.info("Failed to create new customer. Email or phone number already in use");
+            log.info("Failed to create a new customer. Email or phone number already in use");
             throw new CustomerCreateException("Email or phone number already in use");
         }
+    }
+
+    @Override
+    public CustomerDTO updateCustomer(Long id, CustomerDTO customerDTO) {
+        Customer existingCustomer = customerRepository.findById(id).orElse(null);
+        if (existingCustomer == null) {
+            throw new CustomerNotFoundException("Customer with id " + id + " does not exist");
+        }
+
+        validateCustomerDto(customerDTO);
+
+        BeanUtils.copyProperties(customerDTO, existingCustomer, "id");
+        customerRepository.save(existingCustomer);
+
+        return objectMapper.convertValue(existingCustomer, CustomerDTO.class);
     }
 
     @Override
@@ -63,18 +81,6 @@ public class CustomerServiceImpl implements CustomerService {
                 .collect(Collectors.toList());
 
         return customerDTOS;
-    }
-
-    @Override
-    public CustomerDTO updateCustomer(Long id, CustomerDTO customerDTO) {
-        Customer existingCustomer = customerRepository.findById(id).orElse(null);
-        if (existingCustomer == null) {
-            throw new CustomerNotFoundException("Customer with id " + customerDTO.getId() + " does not exist");
-        }
-        BeanUtils.copyProperties(customerDTO, existingCustomer, "id");
-        customerRepository.save(existingCustomer);
-
-        return objectMapper.convertValue(existingCustomer, CustomerDTO.class);
     }
 
     @Override
