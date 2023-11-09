@@ -18,5 +18,8 @@ public class Payment {
     private double discount;
     @Column(name = "total_payment")
     private double totalPayment;
+    @ManyToOne
+    @JoinColumn(name = "booking_id", nullable = false)
+    private Booking booking;
 
 }
