@@ -36,6 +36,5 @@ mvn/wrapper/
 .mvn
 mvnw
 mvnw.cmd
-pom.xml
 gitignore
 .gitignore
