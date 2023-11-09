@@ -109,25 +109,17 @@ public class TravelPackageServiceImpl implements TravelPackageService {
 
     @Override
     public List<TravelPackageDTO> getTravelPackageBetweenDates(LocalDate startingDate, LocalDate endingDate, boolean ascending) {
-        List<TravelPackage> allPackages = travelPackageRepository.findAll();
+        List<TravelPackage> filteredPackages;
 
-        List<TravelPackage> filteredPackages = allPackages.stream()
-                .filter(travelPackage -> travelPackage.getStartingDate().isAfter(startingDate) && travelPackage.getEndingDate().isBefore(endingDate))
-                .collect(Collectors.toList());
-
-        //sorting dates
         if (ascending) {
-            filteredPackages.sort(Comparator.comparing(TravelPackage::getStartingDate));
+            filteredPackages = travelPackageRepository.findByStartingDateBetweenOrderByStartingDateAsc(startingDate, endingDate);
         } else {
-            filteredPackages.sort(Comparator.comparing(TravelPackage::getStartingDate).reversed());
+            filteredPackages = travelPackageRepository.findByStartingDateBetweenOrderByStartingDateDesc(startingDate, endingDate);
         }
 
-        List<TravelPackageDTO> filteredPackagesDTO = new ArrayList<>();
-        for (TravelPackage travelPackage : filteredPackages) {
-            filteredPackagesDTO.add(objectMapper.convertValue(travelPackage, TravelPackageDTO.class));
-
-        }
-        return filteredPackagesDTO;
+        return filteredPackages.stream()
+                .map(this::convertToDTO)
+                .toList();
     }
 
     @Override
