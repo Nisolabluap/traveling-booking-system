@@ -2,6 +2,8 @@ package application.com.orangeteam.services;
 
 import application.com.orangeteam.exceptions.CustomerCreateException;
 import application.com.orangeteam.exceptions.CustomerNotFoundException;
+import application.com.orangeteam.exceptions.InvalidEmailFormatException;
+import application.com.orangeteam.exceptions.InvalidPhoneFormatException;
 import application.com.orangeteam.models.dtos.CustomerDTO;
 import application.com.orangeteam.models.entities.Customer;
 import application.com.orangeteam.repositories.CustomerRepository;
@@ -29,6 +31,19 @@ public class CustomerServiceImpl implements CustomerService {
     @Override
     public CustomerDTO createCustomer(CustomerDTO customerDTO) {
         Customer customer = objectMapper.convertValue(customerDTO, Customer.class);
+
+        String phoneNumber = customer.getPhoneNumber();
+
+        if (!phoneNumber.matches("^(\\+4|)?(07[0-8]{1}[0-9]{1}|02[0-9]{2}|03[0-9]{2}){1}?(\\s|\\.|\\-)?([0-9]{3}(\\s|\\.|\\-|)){2}$")) {
+            throw new InvalidPhoneFormatException("Phone number format invalid.");
+        }
+
+        String email = customer.getEmail();
+
+        if (!email.matches("^[A-Za-z0-9+_.-]+@(.+)$")) {
+            throw new InvalidEmailFormatException("Email format invalid.");
+        }
+
         try {
             Customer customerRepositoryEntity = customerRepository.save(customer);
             log.info("Created customer with id: {}", customerRepositoryEntity.getId());
