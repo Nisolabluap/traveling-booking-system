@@ -132,14 +132,11 @@ public class TravelPackageServiceImpl implements TravelPackageService {
 
     @Override
     public List<TravelPackageDTO> getTravelPackageWithPriceBetweenTwoValues(double minPrice, double maxPrice) {
-        List<TravelPackage> allPackages = travelPackageRepository.findAll();
-        List<TravelPackageDTO> travelPackagesPriceDTOs = new ArrayList<>();
-        for (TravelPackage travelPackage : allPackages) {
-            if (travelPackage.getPricePerPerson() > minPrice && travelPackage.getPricePerPerson() <= maxPrice) {
-                travelPackagesPriceDTOs.add(objectMapper.convertValue(travelPackage, TravelPackageDTO.class));
-            }
-        }
-        return travelPackagesPriceDTOs;
+        List<TravelPackage> filteredPackages = travelPackageRepository.findByPricePerPersonBetween(minPrice, maxPrice);
+
+        return filteredPackages.stream()
+                .map(this::convertToDTO)
+                .toList();
     }
 
     @Override
@@ -150,13 +147,11 @@ public class TravelPackageServiceImpl implements TravelPackageService {
             throw new EntityNotFoundException("No travel packages found for destination: " + destination);
         }
 
-        List<TravelPackageDTO> travelPackageDTOs = new ArrayList<>();
-        for (TravelPackage travelPackage : travelPackages) {
-            travelPackageDTOs.add(convertToDTO(travelPackage));
-        }
-
-        return travelPackageDTOs;
+        return travelPackages.stream()
+                .map(this::convertToDTO)
+                .toList();
     }
+
 
     private boolean isValid(TravelPackageDTO travelPackageDTO) {
         return travelPackageDTO.getStartingDate().isAfter(LocalDate.now()) &&
