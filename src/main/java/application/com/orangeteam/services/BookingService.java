@@ -14,4 +14,9 @@ public interface BookingService {
     List<BookingDTO> getBookingsByTravelPackage(Long travelPackageId);
 
     List<BookingDTO> getBookingsByDestination(String destination);
+    BookingDTO getBookingById(Long id);
+
+    BookingDTO updateBooking(Long id, BookingDTO bookingDTO);
+
+    BookingDTO cancel(Long id);
 }

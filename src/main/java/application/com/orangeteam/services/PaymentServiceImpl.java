@@ -1,60 +1,63 @@
 package application.com.orangeteam.services;
 
-import application.com.orangeteam.exceptions.PaymentException;
-import application.com.orangeteam.models.dtos.BookingDTO;
-import application.com.orangeteam.models.entities.*;
+import application.com.orangeteam.exceptions.BookingNotFoundException;
+import application.com.orangeteam.models.dtos.PaymentDTO;
+import application.com.orangeteam.models.entities.Booking;
+import application.com.orangeteam.models.entities.BookingStatus;
+import application.com.orangeteam.models.entities.Payment;
+import application.com.orangeteam.models.entities.PaymentStatus;
 import application.com.orangeteam.repositories.BookingRepository;
-import application.com.orangeteam.services.PaymentService;
 import application.com.orangeteam.repositories.PaymentRepository;
-import jakarta.persistence.EntityNotFoundException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.Optional;
+import java.util.Random;
 
 @Service
+@Slf4j
 public class PaymentServiceImpl implements PaymentService {
 
     private final PaymentRepository paymentRepository;
     private final BookingRepository bookingRepository;
+    private final Random random;
+    private final ObjectMapper objectMapper;
 
-    @Autowired
-    public PaymentServiceImpl(PaymentRepository paymentRepository, BookingRepository bookingRepository) {
+    public PaymentServiceImpl(PaymentRepository paymentRepository, BookingRepository bookingRepository, Random random, ObjectMapper objectMapper) {
         this.paymentRepository = paymentRepository;
         this.bookingRepository = bookingRepository;
+        this.random = random;
+        this.objectMapper = objectMapper;
     }
 
-    public double getTotalApplyDiscount(double amount, double discountPercentage) {
-        if (discountPercentage < 0 || discountPercentage > 100) {
-            throw new IllegalArgumentException("Discount percentage must be between 0 and 100");
-        }
+    public PaymentDTO processPayment(String creditCardNumber, Long bookingId) {
+        Booking booking = bookingRepository.findById(bookingId)
+                .orElseThrow(() -> new BookingNotFoundException("Booking with id " + bookingId + "not found"));
 
-        double discountAmount = (discountPercentage / 100) * amount;
-        return amount - discountAmount;
-    }
+        double price = booking.getPriceTotal();
 
-    public boolean processPayment(double paymentAmount, Long bookingId) {
-        Optional<Booking> bookingOptional = bookingRepository.findById(bookingId);
-        if (bookingOptional.isPresent()) {
-            Booking booking = bookingOptional.get();
+        Payment payment = new Payment();
+        payment.setPaymentDate(LocalDateTime.now());
+        payment.setTotalAmount(price);
+        payment.setBooking(booking);
 
-            double totalAmount = getTotalApplyDiscount(booking.getTotalAmount(), booking.getDiscount());
-
-            if (paymentAmount >= totalAmount) {
-                Payment payment = new Payment();
-                payment.setPaymentDate(LocalDateTime.now());
-                payment.setTotalPayment(totalAmount);
-                payment.setBooking(booking);
-
-                paymentRepository.save(payment);
-                booking.setPaymentStatus(PaymentStatus.PAID);
-                bookingRepository.save(booking);
-
-                return true;
-            } else throw new PaymentException("Insufficient payment amount");
+        if (makePayment(price, creditCardNumber)) {
+            payment.setPaymentStatus(PaymentStatus.SUCCESSFUL);
+            booking.setBookingStatus(BookingStatus.PAID);
+            bookingRepository.save(booking);
         } else {
-            throw new EntityNotFoundException("Booking not found with ID: " + bookingId);
+            payment.setPaymentStatus(PaymentStatus.FAILED);
         }
+        paymentRepository.save(payment);
+
+        return objectMapper.convertValue(payment, PaymentDTO.class);
+    }
+
+    private boolean makePayment(double amount, String cardNumber) {
+        log.info("Attempted payment of " + amount + "from card ".concat(cardNumber));
+        return random.nextInt(10) < 8;
     }
 }
+

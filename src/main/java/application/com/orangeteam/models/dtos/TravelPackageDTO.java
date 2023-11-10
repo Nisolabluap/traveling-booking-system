@@ -31,6 +31,8 @@ public class TravelPackageDTO {
     @Min(value = 0, message = "Price must be greater than or equal to 0")
     private double pricePerPerson;
 
+    private int discountPercent;
+
     @NotEmpty(message = "This field must not be empty!")
     private LocalDate startingDate;
 

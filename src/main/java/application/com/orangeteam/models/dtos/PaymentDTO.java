@@ -1,15 +1,15 @@
 package application.com.orangeteam.models.dtos;
 
+import application.com.orangeteam.models.entities.PaymentStatus;
 import lombok.Data;
 
 import java.time.LocalDateTime;
-import java.util.UUID;
+
 @Data
 public class PaymentDTO {
-    private UUID id;
-    private double discount;
-    private String booking;
+    private Long id;
+    private Long bookingID;
     private LocalDateTime paymentDate;
-    private double totalPayment;
-    private int numTravelers;
+    private double amount;
+    private PaymentStatus paymentStatus;
 }

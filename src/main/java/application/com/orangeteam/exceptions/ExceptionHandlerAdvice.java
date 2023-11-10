@@ -53,6 +53,11 @@ public class ExceptionHandlerAdvice {
         return new ResponseEntity<>(objectToString(Map.of("message", bookingCreateException.getMessage())), BAD_REQUEST);
     }
 
+    @ExceptionHandler
+    public ResponseEntity<String> bookingNotFoundException(BookingNotFoundException bookingNotFoundException) {
+        return new ResponseEntity<>(objectToString(Map.of("message", bookingNotFoundException.getMessage())), NOT_FOUND);
+    }
+
     @ExceptionHandler(DuplicateBookingException.class)
     public ResponseEntity<String> duplicateBookingException(DuplicateBookingException duplicateBookingException) {
         return new ResponseEntity<>(objectToString(Map.of("message", duplicateBookingException.getMessage())), CONFLICT);

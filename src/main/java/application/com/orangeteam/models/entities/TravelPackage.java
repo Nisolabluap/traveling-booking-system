@@ -24,7 +24,10 @@ public class TravelPackage {
     private String description;
 
     @Column(name = "price")
-    private double pricePerPerson;
+    private double pricePerPersonBeforeDiscount;
+
+    @Column(name = "discount")
+    private int discountPercent;
 
     @Column(name = "starting_date")
     private LocalDate startingDate;
@@ -34,6 +37,7 @@ public class TravelPackage {
 
     @Column(name = "available_reservations")
     private int availableReservations;
+
     @OneToMany(mappedBy = "travelPackage")
     private List<Booking> bookings;
 }
