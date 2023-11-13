@@ -29,8 +29,9 @@ public class TravelPackageDTO {
 
     @NotNull(message = "Price must not be null")
     @Min(value = 0, message = "Price must be greater than or equal to 0")
-    private double pricePerPerson;
+    private double pricePerPersonBeforeDiscount;
 
+    @Min(value = 0, message = "Discount percentage cannot be negative.")
     private int discountPercent;
 
     @NotEmpty(message = "This field must not be empty!")

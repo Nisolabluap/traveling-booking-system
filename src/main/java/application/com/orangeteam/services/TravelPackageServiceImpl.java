@@ -28,7 +28,7 @@ public class TravelPackageServiceImpl implements TravelPackageService {
         existingPackage.setName(packageDTO.getName());
         existingPackage.setDestination(packageDTO.getDestination());
         existingPackage.setDescription(packageDTO.getDescription());
-        existingPackage.setPricePerPersonBeforeDiscount(packageDTO.getPricePerPerson());
+        existingPackage.setPricePerPersonBeforeDiscount(packageDTO.getPricePerPersonBeforeDiscount());
         existingPackage.setDiscountPercent(packageDTO.getDiscountPercent());
         existingPackage.setStartingDate(packageDTO.getStartingDate());
         existingPackage.setEndingDate(packageDTO.getEndingDate());
@@ -117,7 +117,7 @@ public class TravelPackageServiceImpl implements TravelPackageService {
 
     @Override
     public List<TravelPackageDTO> getTravelPackageWithPriceBetweenTwoValues(double minPrice, double maxPrice) {
-        List<TravelPackage> filteredPackages = travelPackageRepository.findByPricePerPersonBetween(minPrice, maxPrice);
+        List<TravelPackage> filteredPackages = travelPackageRepository.findByPricePerPersonBeforeDiscountBetween(minPrice, maxPrice);
 
         return filteredPackages.stream()
                 .map(this::convertToDTO)

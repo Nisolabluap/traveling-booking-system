@@ -1,6 +1,7 @@
 package application.com.orangeteam.services;
 
 import application.com.orangeteam.exceptions.BookingNotFoundException;
+import application.com.orangeteam.exceptions.PaymentException;
 import application.com.orangeteam.models.dtos.PaymentDTO;
 import application.com.orangeteam.models.entities.Booking;
 import application.com.orangeteam.models.entities.BookingStatus;
@@ -22,24 +23,29 @@ public class PaymentServiceImpl implements PaymentService {
 
     private final PaymentRepository paymentRepository;
     private final BookingRepository bookingRepository;
-    private final Random random;
     private final ObjectMapper objectMapper;
+    private final Random random = new Random();
 
-    public PaymentServiceImpl(PaymentRepository paymentRepository, BookingRepository bookingRepository, Random random, ObjectMapper objectMapper) {
+    public PaymentServiceImpl(PaymentRepository paymentRepository, BookingRepository bookingRepository, ObjectMapper objectMapper) {
         this.paymentRepository = paymentRepository;
         this.bookingRepository = bookingRepository;
-        this.random = random;
         this.objectMapper = objectMapper;
     }
 
     public PaymentDTO processPayment(String creditCardNumber, Long bookingId) {
         Booking booking = bookingRepository.findById(bookingId)
                 .orElseThrow(() -> new BookingNotFoundException("Booking with id " + bookingId + "not found"));
+        if (booking.getBookingStatus() == BookingStatus.PAID) {
+            throw new PaymentException("Booking already payed.");
+        } else if(booking.getBookingStatus() == BookingStatus.CANCELLED) {
+            throw new PaymentException("Booking is cancled.");
+        }
 
         double price = booking.getPriceTotal();
 
         Payment payment = new Payment();
         payment.setPaymentDate(LocalDateTime.now());
+        payment.setBankAccountInfo(creditCardNumber);
         payment.setTotalAmount(price);
         payment.setBooking(booking);
 
@@ -53,6 +59,13 @@ public class PaymentServiceImpl implements PaymentService {
         paymentRepository.save(payment);
 
         return objectMapper.convertValue(payment, PaymentDTO.class);
+    }
+
+    public void reimburse(Long paymentID) {
+        Payment payment = paymentRepository.findById(paymentID).get();
+        log.info("Reimbursing " + payment.getTotalAmount() + "to card " + payment.getBankAccountInfo());
+        payment.setPaymentStatus(PaymentStatus.REIMBURSED);
+        paymentRepository.save(payment);
     }
 
     private boolean makePayment(double amount, String cardNumber) {

@@ -16,7 +16,7 @@ public interface BookingService {
     List<BookingDTO> getBookingsByDestination(String destination);
     BookingDTO getBookingById(Long id);
 
-    BookingDTO updateBooking(Long id, BookingDTO bookingDTO);
+    BookingDTO updateNumTravelers(Long id, Integer numTravelers);
 
     BookingDTO cancel(Long id);
 }

@@ -6,7 +6,6 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
-import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
@@ -93,11 +92,7 @@ public class TravelPackageController {
 
     @GetMapping("/by-destination")
     public ResponseEntity<List<TravelPackageDTO>> getTravelPackagesByDestination(@RequestParam String destination) {
-        try {
-            List<TravelPackageDTO> travelPackages = travelPackageService.getTravelPackageByDestination(destination);
-            return ResponseEntity.ok(travelPackages);
-        } catch (EntityNotFoundException e) {
-            return ResponseEntity.notFound().build();
-        }
+        List<TravelPackageDTO> travelPackages = travelPackageService.getTravelPackageByDestination(destination);
+        return ResponseEntity.ok(travelPackages);
     }
 }

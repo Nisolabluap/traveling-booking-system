@@ -1,8 +1,6 @@
 package application.com.orangeteam.controllers;
 
 import application.com.orangeteam.models.dtos.BookingDTO;
-import application.com.orangeteam.models.dtos.CustomerDTO;
-import application.com.orangeteam.models.dtos.TravelPackageDTO;
 import application.com.orangeteam.services.BookingService;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
@@ -15,15 +13,10 @@ import java.util.List;
 @Validated
 @RequestMapping("/api/bookings")
 public class BookingController {
-    private BookingService bookingService;
+    private final BookingService bookingService;
 
     public BookingController(BookingService bookingService) {
         this.bookingService = bookingService;
-    }
-
-    @PostMapping
-    public ResponseEntity<BookingDTO> createBooking(@RequestBody @Valid BookingDTO bookingDTO) {
-        return ResponseEntity.ok(bookingService.createBooking(bookingDTO));
     }
 
     @GetMapping("/{id}")
@@ -31,20 +24,6 @@ public class BookingController {
         BookingDTO bookingDTO = bookingService.getBookingById(id);
         return ResponseEntity.ok(bookingDTO);
     }
-
-    @PostMapping("/{id}")
-    public ResponseEntity<BookingDTO> updateBooking(@PathVariable Long id, @RequestBody BookingDTO bookingDTO) {
-        BookingDTO bookingResponseDTO = bookingService.updateBooking(id, bookingDTO);
-        return ResponseEntity.ok(bookingResponseDTO);
-    }
-
-    @PostMapping("/{id}")
-    public ResponseEntity<BookingDTO> updateBooking(@PathVariable Long id) {
-        BookingDTO bookingResponseDTO = bookingService.cancel(id);
-        return ResponseEntity.ok(bookingResponseDTO);
-    }
-
-
 
     @GetMapping(params = "customerID")
     public ResponseEntity<List<BookingDTO>> getBookingsByCustomer(@RequestParam Long customerID) {
@@ -62,5 +41,22 @@ public class BookingController {
     public ResponseEntity<List<BookingDTO>> getBookingsByDestination(@RequestParam String destination) {
         List<BookingDTO> bookingDTOList = bookingService.getBookingsByDestination(destination);
         return ResponseEntity.ok(bookingDTOList);
+    }
+
+    @PostMapping
+    public ResponseEntity<BookingDTO> createBooking(@RequestBody @Valid BookingDTO bookingDTO) {
+        return ResponseEntity.ok(bookingService.createBooking(bookingDTO));
+    }
+
+    @PostMapping("/{id}")
+    public ResponseEntity<BookingDTO> updateNumTravelers(@PathVariable Long id, @RequestBody Integer numTravelers) {
+        BookingDTO bookingResponseDTO = bookingService.updateNumTravelers(id, numTravelers);
+        return ResponseEntity.ok(bookingResponseDTO);
+    }
+
+    @PostMapping("/id")
+    public ResponseEntity<BookingDTO> cancelBooking(@PathVariable Long id) {
+        BookingDTO bookingResponseDTO = bookingService.cancel(id);
+        return ResponseEntity.ok(bookingResponseDTO);
     }
 }

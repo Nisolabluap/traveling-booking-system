@@ -8,8 +8,9 @@ import java.time.LocalDateTime;
 @Data
 public class PaymentDTO {
     private Long id;
-    private Long bookingID;
     private LocalDateTime paymentDate;
     private double amount;
+    private Long bookingID;
+    private String bankAccountInfo;
     private PaymentStatus paymentStatus;
 }

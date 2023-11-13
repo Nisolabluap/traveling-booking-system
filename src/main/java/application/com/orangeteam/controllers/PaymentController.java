@@ -16,6 +16,10 @@ public class PaymentController {
 
     private PaymentService paymentService;
 
+    public PaymentController(PaymentService paymentService) {
+        this.paymentService = paymentService;
+    }
+
     @PostMapping
     public ResponseEntity<PaymentDTO> processPayment(@RequestParam String creditCardNum, @RequestParam Long bookingId) {
         PaymentDTO paymentDTO = paymentService.processPayment(creditCardNum, bookingId);
