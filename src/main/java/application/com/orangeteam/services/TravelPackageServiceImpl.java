@@ -11,6 +11,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.time.Period;
 import java.util.List;
 import java.util.Optional;
 
@@ -21,6 +22,16 @@ public class TravelPackageServiceImpl implements TravelPackageService {
 
     public TravelPackageServiceImpl(TravelPackageRepository travelPackageRepository) {
         this.travelPackageRepository = travelPackageRepository;
+    }
+
+    private int calculateDuration(LocalDate startingDate, LocalDate endingDate) {
+        Period period = Period.between(startingDate, endingDate);
+        int days = period.getDays();
+        int months = period.getMonths();
+        int years = period.getYears();
+
+        // Convert years and months into days (considering an average of 30.44 days per month)
+        return years * 365 + months * 30 + days;
     }
 
     @NotNull
@@ -52,6 +63,10 @@ public class TravelPackageServiceImpl implements TravelPackageService {
         if (isDuplicate(packageDTO)) {
             throw new DuplicateTravelPackageException("Travel package already exists");
         }
+
+        int duration = calculateDuration(packageDTO.getStartingDate(), packageDTO.getEndingDate());
+        packageDTO.setDuration(duration);
+
         TravelPackage savedPackage = travelPackageRepository.save(convertToEntity(packageDTO));
 
         return convertToDTO(savedPackage);
@@ -66,11 +81,13 @@ public class TravelPackageServiceImpl implements TravelPackageService {
         TravelPackage travelPackageOld = travelPackageRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Travel package with ID " + id + " not found"));
 
+        int duration = calculateDuration(packageDTO.getStartingDate(), packageDTO.getEndingDate());
+        packageDTO.setDuration(duration);
+
         TravelPackage travelPackageNew = updateTravelPackageInfo(packageDTO, travelPackageOld);
 
         return convertToDTO(travelPackageRepository.save(travelPackageNew));
     }
-
 
     @Override
     public void deleteTravelPackage(Long id) {

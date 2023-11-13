@@ -40,16 +40,4 @@ public class TravelPackageDTO {
     @NotEmpty(message = "This field must not be empty!")
     private LocalDate endingDate;
 
-    // Calculate the duration in days based on starting and ending dates
-    public int getDuration() {
-        Period period = Period.between(startingDate, endingDate);
-        int days = period.getDays();
-        int months = period.getMonths();
-        int years = period.getYears();
-
-        // Convert years and months into days (considering an average of 30.44 days per month)
-        int totalDays = years * 365 + months * 30 + days;
-
-        return totalDays;
-    }
 }
