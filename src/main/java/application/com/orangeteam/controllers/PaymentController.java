@@ -1,5 +1,6 @@
 package application.com.orangeteam.controllers;
 
+import application.com.orangeteam.models.dtos.PaymentDTO;
 import application.com.orangeteam.services.PaymentService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -13,10 +14,15 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("api/payments")
 public class PaymentController {
 
-  private PaymentService paymentService;
+    private final PaymentService paymentService;
+
+    public PaymentController(PaymentService paymentService) {
+        this.paymentService = paymentService;
+    }
+
     @PostMapping
-    public ResponseEntity<String> processPayment(@RequestParam double paymentAmount, @RequestParam Long bookingId) {
-            boolean paymentProcessed = paymentService.processPayment(paymentAmount, bookingId);
-            return ResponseEntity.ok("Payment processed successfully");
-}
+    public ResponseEntity<PaymentDTO> processPayment(@RequestParam String creditCardNum, @RequestParam Long bookingId) {
+        PaymentDTO paymentDTO = paymentService.processPayment(creditCardNum, bookingId);
+        return ResponseEntity.ok(paymentDTO);
+    }
 }

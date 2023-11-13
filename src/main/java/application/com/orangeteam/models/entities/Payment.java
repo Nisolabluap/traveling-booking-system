@@ -9,17 +9,25 @@ import java.time.LocalDateTime;
 @Entity
 @Table(name = "payments")
 public class Payment {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
     @Column(name = "payment_date")
     private LocalDateTime paymentDate;
-    @Column(name = "discount")
-    private double discount;
+
     @Column(name = "total_payment")
-    private double totalPayment;
+    private double totalAmount;
+
     @ManyToOne
     @JoinColumn(name = "booking_id", nullable = false)
     private Booking booking;
 
+    @Column(name = "bank_account_info")
+    private String bankAccountInfo;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "payment_status")
+    private PaymentStatus paymentStatus;
 }

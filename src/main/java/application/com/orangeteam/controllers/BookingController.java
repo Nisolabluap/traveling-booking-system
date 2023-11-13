@@ -13,15 +13,16 @@ import java.util.List;
 @Validated
 @RequestMapping("/api/bookings")
 public class BookingController {
-    private BookingService bookingService;
+    private final BookingService bookingService;
 
     public BookingController(BookingService bookingService) {
         this.bookingService = bookingService;
     }
 
-    @PostMapping
-    public ResponseEntity<BookingDTO> createBooking(@RequestBody @Valid BookingDTO bookingDTO) {
-        return ResponseEntity.ok(bookingService.createBooking(bookingDTO));
+    @GetMapping("/{id}")
+    public ResponseEntity<BookingDTO> getBookingByID(@PathVariable Long id) {
+        BookingDTO bookingDTO = bookingService.getBookingById(id);
+        return ResponseEntity.ok(bookingDTO);
     }
 
     @GetMapping(params = "customerID")
@@ -40,5 +41,22 @@ public class BookingController {
     public ResponseEntity<List<BookingDTO>> getBookingsByDestination(@RequestParam String destination) {
         List<BookingDTO> bookingDTOList = bookingService.getBookingsByDestination(destination);
         return ResponseEntity.ok(bookingDTOList);
+    }
+
+    @PostMapping
+    public ResponseEntity<BookingDTO> createBooking(@RequestBody @Valid BookingDTO bookingDTO) {
+        return ResponseEntity.ok(bookingService.createBooking(bookingDTO));
+    }
+
+    @PostMapping("/update-number-travelers/{id}")
+    public ResponseEntity<BookingDTO> updateNumTravelers(@PathVariable Long id, @RequestBody Integer numTravelers) {
+        BookingDTO bookingResponseDTO = bookingService.updateNumTravelers(id, numTravelers);
+        return ResponseEntity.ok(bookingResponseDTO);
+    }
+
+    @PostMapping("/cancel-booking/{id}")
+    public ResponseEntity<BookingDTO> cancelBooking(@PathVariable Long id) {
+        BookingDTO bookingResponseDTO = bookingService.cancel(id);
+        return ResponseEntity.ok(bookingResponseDTO);
     }
 }

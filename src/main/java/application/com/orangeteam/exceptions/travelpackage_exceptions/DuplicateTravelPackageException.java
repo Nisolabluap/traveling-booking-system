@@ -1,4 +1,4 @@
-package application.com.orangeteam.exceptions;
+package application.com.orangeteam.exceptions.travelpackage_exceptions;
 
 public class DuplicateTravelPackageException extends RuntimeException {
 

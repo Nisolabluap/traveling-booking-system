@@ -1,32 +1,26 @@
 package application.com.orangeteam.services;
 
-import application.com.orangeteam.exceptions.DuplicateTravelPackageException;
-import application.com.orangeteam.exceptions.TravelPackageCreateException;
+import application.com.orangeteam.exceptions.travelpackage_exceptions.DuplicateTravelPackageException;
+import application.com.orangeteam.exceptions.travelpackage_exceptions.TravelPackageCreateException;
 import application.com.orangeteam.models.dtos.TravelPackageDTO;
 import application.com.orangeteam.models.entities.TravelPackage;
 import application.com.orangeteam.repositories.TravelPackageRepository;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.persistence.EntityNotFoundException;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
 public class TravelPackageServiceImpl implements TravelPackageService {
 
     private final TravelPackageRepository travelPackageRepository;
-    private final ObjectMapper objectMapper;
 
-    public TravelPackageServiceImpl(TravelPackageRepository travelPackageRepository, ObjectMapper objectMapper) {
+    public TravelPackageServiceImpl(TravelPackageRepository travelPackageRepository) {
         this.travelPackageRepository = travelPackageRepository;
-        this.objectMapper = objectMapper;
     }
 
     @NotNull
@@ -34,7 +28,8 @@ public class TravelPackageServiceImpl implements TravelPackageService {
         existingPackage.setName(packageDTO.getName());
         existingPackage.setDestination(packageDTO.getDestination());
         existingPackage.setDescription(packageDTO.getDescription());
-        existingPackage.setPricePerPerson(packageDTO.getPricePerPerson());
+        existingPackage.setPricePerPersonBeforeDiscount(packageDTO.getPricePerPersonBeforeDiscount());
+        existingPackage.setDiscountPercent(packageDTO.getDiscountPercent());
         existingPackage.setStartingDate(packageDTO.getStartingDate());
         existingPackage.setEndingDate(packageDTO.getEndingDate());
         existingPackage.setAvailableReservations(packageDTO.getAvailableReservations());
@@ -68,16 +63,14 @@ public class TravelPackageServiceImpl implements TravelPackageService {
             throw new TravelPackageCreateException("Invalid dates");
         }
 
-        Optional<TravelPackage> existingPackageOptional = travelPackageRepository.findById(id);
-        if (existingPackageOptional.isPresent()) {
-            TravelPackage existingPackage = updateTravelPackageInfo(packageDTO, existingPackageOptional.get());
-            TravelPackage updatedPackage = travelPackageRepository.save(existingPackage);
+        TravelPackage travelPackageOld = travelPackageRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Travel package with ID " + id + " not found"));
 
-            return convertToDTO(updatedPackage);
-        } else {
-            throw new EntityNotFoundException("Travel package with ID " + id + " not found");
-        }
+        TravelPackage travelPackageNew = updateTravelPackageInfo(packageDTO, travelPackageOld);
+
+        return convertToDTO(travelPackageRepository.save(travelPackageNew));
     }
+
 
     @Override
     public void deleteTravelPackage(Long id) {
@@ -124,7 +117,7 @@ public class TravelPackageServiceImpl implements TravelPackageService {
 
     @Override
     public List<TravelPackageDTO> getTravelPackageWithPriceBetweenTwoValues(double minPrice, double maxPrice) {
-        List<TravelPackage> filteredPackages = travelPackageRepository.findByPricePerPersonBetween(minPrice, maxPrice);
+        List<TravelPackage> filteredPackages = travelPackageRepository.findByPricePerPersonBeforeDiscountBetween(minPrice, maxPrice);
 
         return filteredPackages.stream()
                 .map(this::convertToDTO)

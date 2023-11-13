@@ -22,30 +22,17 @@ public class Booking {
     @JoinColumn(name = "travel_package_id", nullable = false)
     TravelPackage travelPackage;
 
-    @OneToMany(mappedBy = "booking", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "booking")
     List<Payment> payments = new ArrayList<>();
 
     @Column(name = "num_travelers")
     int numTravelers;
 
+    @Column(name = "price_total")
+    private double priceTotal;
+
     @Enumerated(EnumType.STRING)
-    @Column(name = "payment_status")
-    private PaymentStatus paymentStatus;
+    @Column(name = "booking_status")
+    private BookingStatus bookingStatus;
 
-    public double getTotalAmount(){
-        if(travelPackage != null){
-            return numTravelers * travelPackage.getPricePerPerson();
-        } else {
-            return 0.0;
-        }
-    }
-
-    public double getDiscount(){
-        if (!payments.isEmpty()) {
-            Payment firstPayment = payments.get(0);
-            return firstPayment.getDiscount();
-        } else {
-            return 0.0;
-        }
-    }
 }

@@ -1,9 +1,9 @@
 package application.com.orangeteam.services;
 
-import application.com.orangeteam.exceptions.CustomerCreateException;
-import application.com.orangeteam.exceptions.CustomerNotFoundException;
-import application.com.orangeteam.exceptions.InvalidEmailFormatException;
-import application.com.orangeteam.exceptions.InvalidPhoneFormatException;
+import application.com.orangeteam.exceptions.customer_exceptions.CustomerCreateException;
+import application.com.orangeteam.exceptions.customer_exceptions.CustomerNotFoundException;
+import application.com.orangeteam.exceptions.validation_exceptions.InvalidEmailFormatException;
+import application.com.orangeteam.exceptions.validation_exceptions.InvalidPhoneFormatException;
 import application.com.orangeteam.models.dtos.CustomerDTO;
 import application.com.orangeteam.models.entities.Customer;
 import application.com.orangeteam.repositories.CustomerRepository;
