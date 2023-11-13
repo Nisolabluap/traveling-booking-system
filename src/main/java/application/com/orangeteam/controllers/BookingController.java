@@ -48,13 +48,13 @@ public class BookingController {
         return ResponseEntity.ok(bookingService.createBooking(bookingDTO));
     }
 
-    @PostMapping("/{id}")
+    @PostMapping("/update-number-travelers/{id}")
     public ResponseEntity<BookingDTO> updateNumTravelers(@PathVariable Long id, @RequestBody Integer numTravelers) {
         BookingDTO bookingResponseDTO = bookingService.updateNumTravelers(id, numTravelers);
         return ResponseEntity.ok(bookingResponseDTO);
     }
 
-    @PostMapping("/id")
+    @PostMapping("/cancel-booking/{id}")
     public ResponseEntity<BookingDTO> cancelBooking(@PathVariable Long id) {
         BookingDTO bookingResponseDTO = bookingService.cancel(id);
         return ResponseEntity.ok(bookingResponseDTO);

@@ -1,4 +1,4 @@
-package application.com.orangeteam.exceptions;
+package application.com.orangeteam.exceptions.validation_exceptions;
 
 public class InvalidPhoneFormatException extends RuntimeException {
 

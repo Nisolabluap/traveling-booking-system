@@ -16,6 +16,7 @@ public class BookingDTO {
     @NotNull
     private long travelPackageID;
 
+    @NotNull
     @Min(value = 1, message = "Cannot create booking for less than one traveler.")
     private int numTravelers;
 

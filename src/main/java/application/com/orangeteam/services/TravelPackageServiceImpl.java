@@ -1,7 +1,7 @@
 package application.com.orangeteam.services;
 
-import application.com.orangeteam.exceptions.DuplicateTravelPackageException;
-import application.com.orangeteam.exceptions.TravelPackageCreateException;
+import application.com.orangeteam.exceptions.travelpackage_exceptions.DuplicateTravelPackageException;
+import application.com.orangeteam.exceptions.travelpackage_exceptions.TravelPackageCreateException;
 import application.com.orangeteam.models.dtos.TravelPackageDTO;
 import application.com.orangeteam.models.entities.TravelPackage;
 import application.com.orangeteam.repositories.TravelPackageRepository;

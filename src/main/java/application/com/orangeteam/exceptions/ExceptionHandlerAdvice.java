@@ -1,5 +1,15 @@
 package application.com.orangeteam.exceptions;
 
+import application.com.orangeteam.exceptions.booking_exceptions.BookingCreateException;
+import application.com.orangeteam.exceptions.booking_exceptions.BookingNotFoundException;
+import application.com.orangeteam.exceptions.booking_exceptions.DuplicateBookingException;
+import application.com.orangeteam.exceptions.customer_exceptions.CustomerCreateException;
+import application.com.orangeteam.exceptions.customer_exceptions.CustomerNotFoundException;
+import application.com.orangeteam.exceptions.travelpackage_exceptions.DuplicateTravelPackageException;
+import application.com.orangeteam.exceptions.travelpackage_exceptions.TravelPackageCreateException;
+import application.com.orangeteam.exceptions.travelpackage_exceptions.TravelPackageNotFoundException;
+import application.com.orangeteam.exceptions.validation_exceptions.InvalidEmailFormatException;
+import application.com.orangeteam.exceptions.validation_exceptions.InvalidPhoneFormatException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;

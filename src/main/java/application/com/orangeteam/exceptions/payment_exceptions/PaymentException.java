@@ -1,4 +1,4 @@
-package application.com.orangeteam.exceptions;
+package application.com.orangeteam.exceptions.payment_exceptions;
 
 public class PaymentException extends RuntimeException{
     public PaymentException(String message){

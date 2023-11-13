@@ -1,4 +1,4 @@
-package application.com.orangeteam.exceptions;
+package application.com.orangeteam.exceptions.customer_exceptions;
 
 public class CustomerCreateException extends RuntimeException {
 

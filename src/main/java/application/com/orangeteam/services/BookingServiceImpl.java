@@ -1,17 +1,20 @@
 package application.com.orangeteam.services;
 
-import application.com.orangeteam.exceptions.*;
+import application.com.orangeteam.exceptions.booking_exceptions.BookingCreateException;
+import application.com.orangeteam.exceptions.booking_exceptions.BookingNotFoundException;
+import application.com.orangeteam.exceptions.booking_exceptions.DuplicateBookingException;
+import application.com.orangeteam.exceptions.customer_exceptions.CustomerNotFoundException;
+import application.com.orangeteam.exceptions.travelpackage_exceptions.TravelPackageNotFoundException;
 import application.com.orangeteam.models.dtos.BookingDTO;
 import application.com.orangeteam.models.entities.*;
 import application.com.orangeteam.repositories.BookingRepository;
 import application.com.orangeteam.repositories.CustomerRepository;
 import application.com.orangeteam.repositories.PaymentRepository;
 import application.com.orangeteam.repositories.TravelPackageRepository;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.transaction.Transactional;
 import jakarta.validation.constraints.NotNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-
 
 import java.util.ArrayList;
 import java.util.List;
@@ -25,24 +28,22 @@ public class BookingServiceImpl implements BookingService {
     private final BookingRepository bookingRepository;
     private final PaymentRepository paymentRepository;
     private final PaymentService paymentService;
-    private final ObjectMapper objectMapper;
 
     public BookingServiceImpl(
             CustomerRepository customerRepository,
             TravelPackageRepository travelPackageRepository,
             BookingRepository bookingRepository,
             PaymentRepository paymentRepository,
-            PaymentService paymentService,
-            ObjectMapper objectMapper) {
+            PaymentService paymentService) {
         this.customerRepository = customerRepository;
         this.travelPackageRepository = travelPackageRepository;
         this.bookingRepository = bookingRepository;
         this.paymentRepository = paymentRepository;
         this.paymentService = paymentService;
-        this.objectMapper = objectMapper;
     }
 
     @Override
+    @Transactional
     public BookingDTO createBooking(BookingDTO bookingDTO) {
         if (isDuplicate(bookingDTO)) {
             throw new DuplicateBookingException("Duplicate booking detected. Use update to modify booking.");
@@ -54,7 +55,7 @@ public class BookingServiceImpl implements BookingService {
         TravelPackage travelPackage = travelPackageRepository.findById(bookingDTO.getTravelPackageID())
                 .orElseThrow(() -> new TravelPackageNotFoundException("Invalid travel package ID"));
         Customer customer = customerRepository.findById(bookingDTO.getCustomerID())
-                        .orElseThrow(() -> new CustomerNotFoundException("Invalid customer id."));
+                .orElseThrow(() -> new CustomerNotFoundException("Invalid customer id."));
 
         travelPackage.setAvailableReservations(travelPackage.getAvailableReservations() - bookingDTO.getNumTravelers());
         travelPackage = travelPackageRepository.save(travelPackage);
@@ -62,7 +63,6 @@ public class BookingServiceImpl implements BookingService {
         double priceTotal = calculateTotal(bookingDTO.getNumTravelers(),
                 travelPackage.getPricePerPersonBeforeDiscount(),
                 travelPackage.getDiscountPercent());
-        log.info("price total is " + priceTotal);
 
         Booking booking = new Booking();
         booking.setCustomer(customer);
@@ -78,6 +78,7 @@ public class BookingServiceImpl implements BookingService {
         bookingResponseDTO.setCustomerID(bookingEntity.getCustomer().getId());
         bookingResponseDTO.setNumTravelers(bookingEntity.getNumTravelers());
         bookingResponseDTO.setPriceTotal(bookingEntity.getPriceTotal());
+        bookingResponseDTO.setBookingStatus(bookingEntity.getBookingStatus());
 
 
         return bookingResponseDTO;
@@ -86,7 +87,7 @@ public class BookingServiceImpl implements BookingService {
     private double calculateTotal(int numTravelers, double pricePerPersonBeforeDiscount, int discountPercent) {
         double totalBeforeDiscount = numTravelers * pricePerPersonBeforeDiscount;
         double discountAmount = totalBeforeDiscount * discountPercent / 100;
-        return  totalBeforeDiscount - discountAmount;
+        return totalBeforeDiscount - discountAmount;
     }
 
     private boolean isDuplicate(BookingDTO bookingDTO) {
@@ -114,7 +115,7 @@ public class BookingServiceImpl implements BookingService {
     private List<BookingDTO> getBookingDTOS(List<Booking> bookingEntityList) {
         List<BookingDTO> bookingDTOList = new ArrayList<>();
         for (Booking bookingEntity : bookingEntityList) {
-            bookingDTOList.add(objectMapper.convertValue(bookingEntity, BookingDTO.class));
+            bookingDTOList.add(convertToDTO(bookingEntity));
         }
         return bookingDTOList;
     }
@@ -122,23 +123,26 @@ public class BookingServiceImpl implements BookingService {
     @Override
     public List<BookingDTO> getBookingsByTravelPackage(Long travelPackageId) {
         List<Booking> bookingEntityList = bookingRepository.findByTravelPackage(travelPackageRepository.findById(travelPackageId)
-                .orElseThrow(() -> new RuntimeException("Cannot find travel package with id " + travelPackageId)));
+                .orElseThrow(() -> new TravelPackageNotFoundException("Cannot find travel package with id " + travelPackageId)));
         return getBookingDTOS(bookingEntityList);
     }
+
     @Override
-    public List<BookingDTO> getBookingsByDestination(String destination){
+    public List<BookingDTO> getBookingsByDestination(String destination) {
         List<TravelPackage> travelPackages = travelPackageRepository.findByDestination(destination);
         List<Booking> allBookingsWithDestination = new ArrayList<>();
         for (TravelPackage travelPackage : travelPackages) {
             List<Booking> bookingsWithTravelPackage = bookingRepository.findByTravelPackage(travelPackage);
             allBookingsWithDestination.addAll(bookingsWithTravelPackage);
         }
-       return getBookingDTOS(allBookingsWithDestination);
+        return getBookingDTOS(allBookingsWithDestination);
     }
 
     @Override
     public BookingDTO getBookingById(Long id) {
-        return objectMapper.convertValue(bookingRepository.findById(id), BookingDTO.class);
+        Booking booking = bookingRepository.findById(id)
+                .orElseThrow(() -> new BookingNotFoundException("Booking not found"));
+        return convertToDTO(booking);
     }
 
     @Override
@@ -169,7 +173,7 @@ public class BookingServiceImpl implements BookingService {
                 travelPackage.getDiscountPercent()));
         Booking updatedBooking = bookingRepository.save(bookingToBeUpdated);
 
-        return objectMapper.convertValue(updatedBooking, BookingDTO.class);
+        return convertToDTO(updatedBooking);
     }
 
     @Override
@@ -197,6 +201,17 @@ public class BookingServiceImpl implements BookingService {
         bookingToBeCanceled.setBookingStatus(BookingStatus.CANCELLED);
         Booking canceledBooking = bookingRepository.save(bookingToBeCanceled);
 
-        return objectMapper.convertValue(canceledBooking, BookingDTO.class);
+        return convertToDTO(canceledBooking);
+    }
+
+    private BookingDTO convertToDTO(Booking booking) {
+        BookingDTO bookingDTO = new BookingDTO();
+        booking.setId(booking.getId());
+        bookingDTO.setCustomerID(booking.getCustomer().getId());
+        bookingDTO.setTravelPackageID(booking.getTravelPackage().getId());
+        booking.setNumTravelers(booking.getNumTravelers());
+        bookingDTO.setPriceTotal(booking.getPriceTotal());
+        bookingDTO.setBookingStatus(booking.getBookingStatus());
+        return bookingDTO;
     }
 }

@@ -1,7 +1,7 @@
 package application.com.orangeteam.services;
 
-import application.com.orangeteam.exceptions.BookingNotFoundException;
-import application.com.orangeteam.exceptions.PaymentException;
+import application.com.orangeteam.exceptions.booking_exceptions.BookingNotFoundException;
+import application.com.orangeteam.exceptions.payment_exceptions.PaymentException;
 import application.com.orangeteam.models.dtos.PaymentDTO;
 import application.com.orangeteam.models.entities.Booking;
 import application.com.orangeteam.models.entities.BookingStatus;
@@ -9,9 +9,7 @@ import application.com.orangeteam.models.entities.Payment;
 import application.com.orangeteam.models.entities.PaymentStatus;
 import application.com.orangeteam.repositories.BookingRepository;
 import application.com.orangeteam.repositories.PaymentRepository;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -23,13 +21,11 @@ public class PaymentServiceImpl implements PaymentService {
 
     private final PaymentRepository paymentRepository;
     private final BookingRepository bookingRepository;
-    private final ObjectMapper objectMapper;
     private final Random random = new Random();
 
-    public PaymentServiceImpl(PaymentRepository paymentRepository, BookingRepository bookingRepository, ObjectMapper objectMapper) {
+    public PaymentServiceImpl(PaymentRepository paymentRepository, BookingRepository bookingRepository) {
         this.paymentRepository = paymentRepository;
         this.bookingRepository = bookingRepository;
-        this.objectMapper = objectMapper;
     }
 
     public PaymentDTO processPayment(String creditCardNumber, Long bookingId) {
@@ -38,7 +34,7 @@ public class PaymentServiceImpl implements PaymentService {
         if (booking.getBookingStatus() == BookingStatus.PAID) {
             throw new PaymentException("Booking already payed.");
         } else if(booking.getBookingStatus() == BookingStatus.CANCELLED) {
-            throw new PaymentException("Booking is cancled.");
+            throw new PaymentException("Booking is canceled.");
         }
 
         double price = booking.getPriceTotal();
@@ -56,9 +52,16 @@ public class PaymentServiceImpl implements PaymentService {
         } else {
             payment.setPaymentStatus(PaymentStatus.FAILED);
         }
-        paymentRepository.save(payment);
+        Payment paymentEntity = paymentRepository.save(payment);
+        PaymentDTO paymentResponseDTO = new PaymentDTO();
+        paymentResponseDTO.setId(paymentEntity.getId());
+        paymentResponseDTO.setPaymentDate(paymentEntity.getPaymentDate());
+        paymentResponseDTO.setAmount(paymentEntity.getTotalAmount());
+        paymentResponseDTO.setBookingID(paymentEntity.getBooking().getId());
+        paymentResponseDTO.setBankAccountInfo(paymentEntity.getBankAccountInfo());
+        paymentResponseDTO.setPaymentStatus(paymentEntity.getPaymentStatus());
 
-        return objectMapper.convertValue(payment, PaymentDTO.class);
+        return paymentResponseDTO;
     }
 
     public void reimburse(Long paymentID) {
