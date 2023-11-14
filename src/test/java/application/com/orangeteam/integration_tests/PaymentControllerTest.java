@@ -8,7 +8,6 @@ import application.com.orangeteam.repositories.TravelPackageRepository;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.transaction.Transactional;
-import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,7 +30,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ExtendWith(SpringExtension.class)
 @SpringBootTest
 @AutoConfigureMockMvc
-@Slf4j
 @Transactional
 @AutoConfigureTestDatabase
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
@@ -104,7 +102,6 @@ class PaymentControllerTest {
 
     @Test
     void makePaymentForPaidOrCanceledBookingShouldFail() throws Exception {
-
         Customer customer = new Customer();
         customer.setId(1L);
         customerRepository.save(customer);
