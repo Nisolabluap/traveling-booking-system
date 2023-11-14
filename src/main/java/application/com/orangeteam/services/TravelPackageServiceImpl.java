@@ -2,7 +2,11 @@ package application.com.orangeteam.services;
 
 import application.com.orangeteam.exceptions.travelpackage_exceptions.DuplicateTravelPackageException;
 import application.com.orangeteam.exceptions.travelpackage_exceptions.TravelPackageCreateException;
+import application.com.orangeteam.exceptions.travelpackage_exceptions.TravelPackageDeleteException;
+import application.com.orangeteam.exceptions.travelpackage_exceptions.TravelPackageNotFoundException;
 import application.com.orangeteam.models.dtos.TravelPackageDTO;
+import application.com.orangeteam.models.entities.Booking;
+import application.com.orangeteam.models.entities.BookingStatus;
 import application.com.orangeteam.models.entities.TravelPackage;
 import application.com.orangeteam.repositories.TravelPackageRepository;
 import jakarta.persistence.EntityNotFoundException;
@@ -10,6 +14,7 @@ import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 
+import java.awt.print.Book;
 import java.time.LocalDate;
 import java.time.Period;
 import java.util.List;
@@ -91,7 +96,15 @@ public class TravelPackageServiceImpl implements TravelPackageService {
 
     @Override
     public void deleteTravelPackage(Long id) {
-        travelPackageRepository.deleteById(id);
+        TravelPackage travelPackage = travelPackageRepository.findById(id)
+                .orElseThrow(() -> new TravelPackageNotFoundException("Travel package with id " + id + " not found."));
+        Optional<Booking> validBooking = travelPackage.getBookings().stream()
+                .filter(booking -> booking.getBookingStatus() != BookingStatus.CANCELLED)
+                .findAny();
+        if (validBooking.isPresent()) {
+            throw new TravelPackageDeleteException("Cannot delete travel package with bookings");
+        }
+        travelPackageRepository.delete(travelPackage);
     }
 
     @Override
