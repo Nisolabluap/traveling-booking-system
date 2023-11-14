@@ -66,7 +66,6 @@ public class TravelPackageServiceImpl implements TravelPackageService {
 
         int duration = calculateDuration(packageDTO.getStartingDate(), packageDTO.getEndingDate());
         packageDTO.setDuration(duration);
-
         TravelPackage savedPackage = travelPackageRepository.save(convertToEntity(packageDTO));
 
         return convertToDTO(savedPackage);
@@ -168,7 +167,6 @@ public class TravelPackageServiceImpl implements TravelPackageService {
                 travelPackageDTO.getStartingDate(),
                 travelPackageDTO.getEndingDate()
         );
-
         return existingPackage != null;
     }
 }

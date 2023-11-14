@@ -1,7 +1,7 @@
 package application.com.orangeteam.services;
 
 import application.com.orangeteam.exceptions.booking_exceptions.BookingNotFoundException;
-import application.com.orangeteam.exceptions.payment_exceptions.PaymentException;
+import application.com.orangeteam.exceptions.payment_exceptions.PaymentStatusNotBookedException;
 import application.com.orangeteam.models.dtos.PaymentDTO;
 import application.com.orangeteam.models.entities.Booking;
 import application.com.orangeteam.models.entities.BookingStatus;
@@ -32,9 +32,9 @@ public class PaymentServiceImpl implements PaymentService {
         Booking booking = bookingRepository.findById(bookingId)
                 .orElseThrow(() -> new BookingNotFoundException("Booking with id " + bookingId + "not found"));
         if (booking.getBookingStatus() == BookingStatus.PAID) {
-            throw new PaymentException("Booking already payed.");
+            throw new PaymentStatusNotBookedException("Booking already payed.");
         } else if(booking.getBookingStatus() == BookingStatus.CANCELLED) {
-            throw new PaymentException("Booking is canceled.");
+            throw new PaymentStatusNotBookedException("Booking is canceled.");
         }
 
         double price = booking.getPriceTotal();
@@ -55,7 +55,7 @@ public class PaymentServiceImpl implements PaymentService {
         Payment paymentEntity = paymentRepository.save(payment);
         PaymentDTO paymentResponseDTO = new PaymentDTO();
         paymentResponseDTO.setId(paymentEntity.getId());
-        paymentResponseDTO.setPaymentDate(paymentEntity.getPaymentDate());
+        paymentResponseDTO.setPaymentDateTime(paymentEntity.getPaymentDate());
         paymentResponseDTO.setAmount(paymentEntity.getTotalAmount());
         paymentResponseDTO.setBookingID(paymentEntity.getBooking().getId());
         paymentResponseDTO.setBankAccountInfo(paymentEntity.getBankAccountInfo());
