@@ -77,7 +77,7 @@ public class EmailServiceImpl implements EmailService {
         context.setVariable("bookingID", paymentDTO.getBookingID());
         context.setVariable("paymentID", paymentDTO.getId());
         String emailContent = emailTemplateEngine.process("payment-successful", context);
-        sendEmail("Payment failed", emailContent, customerDTO.getEmail());
+        sendEmail("Payment successful", emailContent, customerDTO.getEmail());
     }
 
     @Override
@@ -94,11 +94,11 @@ public class EmailServiceImpl implements EmailService {
     public void sendItineraryChangeEmail(CustomerDTO customerDTO, BookingDTO bookingDTO,
                                          TravelPackageDTO oldTravelPackageDTO, TravelPackageDTO updatedTravelPackage) {
         Map<String, Object> contextMap = new HashMap<>();
-        contextMap.put("oldStartDate", oldTravelPackageDTO.getStartingDate());
-        contextMap.put("oldEndDate", oldTravelPackageDTO.getEndingDate());
+        contextMap.put("oldStartDate", oldTravelPackageDTO.getStartingDate().toString());
+        contextMap.put("oldEndDate", oldTravelPackageDTO.getEndingDate().toString());
         contextMap.put("oldDestination", oldTravelPackageDTO.getDestination());
-        contextMap.put("updatedStartDate", updatedTravelPackage.getStartingDate());
-        contextMap.put("updatedEndDate", updatedTravelPackage.getEndingDate());
+        contextMap.put("updatedStartDate", updatedTravelPackage.getStartingDate().toString());
+        contextMap.put("updatedEndDate", updatedTravelPackage.getEndingDate().toString());
         contextMap.put("updatedDestination", updatedTravelPackage.getDestination());
         contextMap.put("firstName", customerDTO.getFirstName());
         contextMap.put("bookingID", bookingDTO.getId());
