@@ -76,11 +76,8 @@ public class CustomerServiceImpl implements CustomerService {
     public List<CustomerDTO> getAllCustomers() {
         List<Customer> customers = customerRepository.findAll();
 
-        List<CustomerDTO> customerDTOS = customers.stream()
-                .map(customer -> objectMapper.convertValue(customer, CustomerDTO.class))
-                .collect(Collectors.toList());
-
-        return customerDTOS;
+        return customers.stream()
+                .map(customer -> objectMapper.convertValue(customer, CustomerDTO.class)).toList();
     }
 
     @Override
