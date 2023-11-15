@@ -8,6 +8,7 @@ import application.com.orangeteam.exceptions.customer_exceptions.CustomerNotFoun
 import application.com.orangeteam.exceptions.payment_exceptions.PaymentStatusNotBookedException;
 import application.com.orangeteam.exceptions.travelpackage_exceptions.DuplicateTravelPackageException;
 import application.com.orangeteam.exceptions.travelpackage_exceptions.TravelPackageCreateException;
+import application.com.orangeteam.exceptions.travelpackage_exceptions.TravelPackageDeleteException;
 import application.com.orangeteam.exceptions.travelpackage_exceptions.TravelPackageNotFoundException;
 import application.com.orangeteam.exceptions.validation_exceptions.InvalidEmailFormatException;
 import application.com.orangeteam.exceptions.validation_exceptions.InvalidPhoneFormatException;
@@ -57,6 +58,11 @@ public class ExceptionHandlerAdvice {
     @ExceptionHandler(TravelPackageNotFoundException.class)
     public ResponseEntity<String> travelPackageNotFoundException(TravelPackageNotFoundException travelPackageNotFoundException) {
         return new ResponseEntity<>(objectToString(Map.of("message", travelPackageNotFoundException.getMessage())), NOT_FOUND);
+    }
+
+    @ExceptionHandler(TravelPackageDeleteException.class)
+    public ResponseEntity<String> travelPackageDeleteException(TravelPackageDeleteException travelPackageDeleteException) {
+        return new ResponseEntity<>(objectToString(Map.of("message", travelPackageDeleteException.getMessage())), CONFLICT);
     }
 
     @ExceptionHandler(BookingCreateException.class)
