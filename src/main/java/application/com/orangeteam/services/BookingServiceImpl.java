@@ -72,16 +72,7 @@ public class BookingServiceImpl implements BookingService {
         booking.setBookingStatus(BookingStatus.BOOKED);
         Booking bookingEntity = bookingRepository.save(booking);
 
-        BookingDTO bookingResponseDTO = new BookingDTO();
-        bookingResponseDTO.setId(bookingEntity.getId());
-        bookingResponseDTO.setTravelPackageID(bookingEntity.getTravelPackage().getId());
-        bookingResponseDTO.setCustomerID(bookingEntity.getCustomer().getId());
-        bookingResponseDTO.setNumTravelers(bookingEntity.getNumTravelers());
-        bookingResponseDTO.setPriceTotal(bookingEntity.getPriceTotal());
-        bookingResponseDTO.setBookingStatus(bookingEntity.getBookingStatus());
-
-
-        return bookingResponseDTO;
+        return convertToDTO(bookingEntity);
     }
 
     private double calculateTotal(int numTravelers, double pricePerPersonBeforeDiscount, int discountPercent) {
