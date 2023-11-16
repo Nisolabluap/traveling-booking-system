@@ -12,6 +12,7 @@ import application.com.orangeteam.repositories.TravelPackageRepository;
 import jakarta.persistence.EntityNotFoundException;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -24,6 +25,7 @@ public class TravelPackageServiceImpl implements TravelPackageService {
 
     private final TravelPackageRepository travelPackageRepository;
 
+    @Autowired
     public TravelPackageServiceImpl(TravelPackageRepository travelPackageRepository) {
         this.travelPackageRepository = travelPackageRepository;
     }
