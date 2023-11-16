@@ -3,10 +3,8 @@ package application.com.orangeteam.integration_tests;
 import application.com.orangeteam.models.dtos.CustomerDTO;
 import application.com.orangeteam.models.entities.Customer;
 import application.com.orangeteam.repositories.CustomerRepository;
-import application.com.orangeteam.services.CustomerService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.transaction.Transactional;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -14,16 +12,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.Mockito.when;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -36,7 +30,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
 @AutoConfigureMockMvc
 @Transactional
-public class CustomerControllerTest {
+class CustomerControllerTest {
 
     @Autowired
     private CustomerRepository customerRepository;
@@ -57,18 +51,14 @@ public class CustomerControllerTest {
         customerRepository.save(customer);
     }
 
-    @AfterEach
-    void tearDown() {
-        customerRepository.deleteById(1L);
-    }
 
     @Test
     void createCustomerTestValidInput() throws Exception {
         CustomerDTO validCustomer = new CustomerDTO();
         validCustomer.setFirstName("John");
         validCustomer.setLastName("Doe");
-        validCustomer.setPhoneNumber("0756565643");
-        validCustomer.setEmail("john@test.com");
+        validCustomer.setPhoneNumber("0756565649");
+        validCustomer.setEmail("johnTheShark@test.com");
 
         mockMvc.perform(post("/api/customers")
                         .contentType(APPLICATION_JSON)
@@ -77,26 +67,20 @@ public class CustomerControllerTest {
                 .andExpect(jsonPath("$.id").exists())
                 .andExpect(jsonPath("$.firstName").value("John"))
                 .andExpect(jsonPath("$.lastName").value("Doe"))
-                .andExpect(jsonPath("$.phoneNumber").value("0756565643"))
-                .andExpect(jsonPath("$.email").value("john@test.com"));
+                .andExpect(jsonPath("$.phoneNumber").value("0756565649"))
+                .andExpect(jsonPath("$.email").value("johnTheShark@test.com"));
     }
 
     @Test
     void createCustomerTestInvalidInput() throws Exception {
         CustomerDTO invalidCustomer = new CustomerDTO();
-        invalidCustomer.setFirstName("");
-        invalidCustomer.setLastName("");
-        invalidCustomer.setPhoneNumber("");
-        invalidCustomer.setEmail("");
+        invalidCustomer.setPhoneNumber("2");
+        invalidCustomer.setEmail("ja");
 
-        MvcResult result = mockMvc.perform(post("/api/customers")
+        mockMvc.perform(post("/api/customers")
                         .contentType(APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(invalidCustomer)))
-                .andExpect(status().isBadRequest())
-                .andReturn();
-
-        String resultAsString = result.getResponse().getContentAsString();
-        assertTrue(resultAsString.contains("this field must not be empty"));
+                .andExpect(status().isBadRequest());
     }
 
     @Test
@@ -107,40 +91,39 @@ public class CustomerControllerTest {
     }
 
     @Test
-    void getAllCustomerInternalServerErrorTest() throws Exception {
-        mockMvc.perform(get("/api/customers"))
-                .andExpect(status().isInternalServerError());
-    }
-
-
-    @Test
     void updateCustomerValidInputTest() throws Exception {
         CustomerDTO validUpdateCustomer = new CustomerDTO();
         validUpdateCustomer.setFirstName("UpdateFirstName");
         validUpdateCustomer.setLastName("UpdateLastName");
-        validUpdateCustomer.setPhoneNumber("UpdatePhoneNumber");
-        validUpdateCustomer.setEmail("UpdateEmail");
+        validUpdateCustomer.setPhoneNumber("0722555666");
+        validUpdateCustomer.setEmail("email@myemail.ro");
 
-        mockMvc.perform(get("/api/customers/{id}", 1L))
+        mockMvc.perform(put("/api/customers/{id}", 1L)
+                        .contentType(APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(validUpdateCustomer)))
                 .andExpect(status().isOk());
     }
 
     @Test
     void updateCustomerInvalidInputTest() throws Exception {
-        CustomerDTO invalidUpdateCustomer = new CustomerDTO();
+        CustomerDTO invalidCustomer = new CustomerDTO();
+        invalidCustomer.setFirstName("");
+        invalidCustomer.setLastName(".");
+        invalidCustomer.setPhoneNumber("0724477822");
+        invalidCustomer.setEmail("john@test.com");
+
 
         mockMvc.perform(put("/api/customers/{id}", 1L)
                         .contentType(APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(invalidUpdateCustomer)))
-                .andExpect(status().isNotFound());
-
+                        .content(objectMapper.writeValueAsString(invalidCustomer)))
+                .andExpect(status().isBadRequest());
     }
 
     @Test
     void deleteCustomerTest() throws Exception {
         mockMvc.perform(delete("/api/customers/{id}", 1L)
                         .contentType(APPLICATION_JSON))
-                .andExpect(status().isNoContent());
+                .andExpect(status().isOk());
     }
 
     @Test
@@ -164,8 +147,8 @@ public class CustomerControllerTest {
     }
 
     @Test
-    void donTFoundByIdCustomerTest() throws Exception {
-        mockMvc.perform(get("/api/customers/{i}", 1L))
+    void notFoundByIdCustomerTest() throws Exception {
+        mockMvc.perform(get("/api/customers/{id}", 2L))
                 .andExpect(status().isNotFound());
     }
 

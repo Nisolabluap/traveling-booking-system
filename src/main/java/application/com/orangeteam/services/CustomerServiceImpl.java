@@ -49,7 +49,6 @@ public class CustomerServiceImpl implements CustomerService {
 
         try {
             Customer customerRepositoryEntity = customerRepository.save(customer);
-            log.info("Created customer with id: {}", customerRepositoryEntity.getId());
             return objectMapper.convertValue(customerRepositoryEntity, CustomerDTO.class);
         } catch (DataIntegrityViolationException exception) {
             log.info("Failed to create a new customer. Email or phone number already in use");
@@ -59,11 +58,8 @@ public class CustomerServiceImpl implements CustomerService {
 
     @Override
     public CustomerDTO updateCustomer(Long id, CustomerDTO customerDTO) {
-        Customer existingCustomer = customerRepository.findById(id).orElse(null);
-        if (existingCustomer == null) {
-            throw new CustomerNotFoundException("Customer with id " + id + " does not exist");
-        }
-
+        Customer existingCustomer = customerRepository.findById(id)
+                .orElseThrow(() -> new CustomerNotFoundException("Customer with id " + id + " does not exist"));
         validateCustomerDto(customerDTO);
 
         BeanUtils.copyProperties(customerDTO, existingCustomer, "id");
@@ -82,12 +78,9 @@ public class CustomerServiceImpl implements CustomerService {
 
     @Override
     public void deleteCustomer(Long id) {
-        Customer existingCustomer = customerRepository.findById(id).orElse(null);
-        if (existingCustomer == null) {
-            customerRepository.deleteById(id);
-        } else {
-            throw new CustomerNotFoundException("Customer with id " + id + " does not exist");
-        }
+        Customer existingCustomer = customerRepository.findById(id)
+                .orElseThrow(() -> new CustomerNotFoundException("Customer with id " + id + " does not exist"));
+        customerRepository.delete(existingCustomer);
     }
 
     @Override

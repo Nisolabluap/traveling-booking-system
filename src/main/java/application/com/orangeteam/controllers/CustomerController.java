@@ -9,8 +9,8 @@ import org.springframework.web.bind.annotation.*;
 import io.swagger.annotations.*;
 import java.util.List;
 
-@Validated
 @RestController
+@Validated
 @RequestMapping("/api/customers")
 @Api(value = "Customer API", description = "Operations for managing customers")
 public class CustomerController {
