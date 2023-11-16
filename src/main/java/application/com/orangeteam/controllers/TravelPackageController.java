@@ -97,7 +97,9 @@ public class TravelPackageController {
             List<TravelPackageDTO> travelPackages = travelPackageService.getTravelPackageByDestination(destination);
             return ResponseEntity.ok(travelPackages);
         } catch (EntityNotFoundException ex) {
-            return ResponseEntity.badRequest().body(List.of());
+            return ResponseEntity.notFound().build();
+        } catch (IllegalArgumentException ex) {
+            return ResponseEntity.badRequest().build();
         }
     }
 }

@@ -104,7 +104,7 @@ class TravelPackageControllerTest {
     void getTravelPackagesByDestinationShouldFail() throws Exception {
         mockMvc.perform(get("/api/travel-packages/by-destination")
                         .param("destination", "Test aDestination"))
-                .andExpect(status().isBadRequest())
+                .andExpect(status().isNotFound())
                 .andReturn();
     }
 
