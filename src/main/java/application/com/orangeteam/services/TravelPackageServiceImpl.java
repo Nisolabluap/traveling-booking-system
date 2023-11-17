@@ -76,14 +76,16 @@ public class TravelPackageServiceImpl implements TravelPackageService {
                 || !travelPackageOld.getEndingDate().isEqual(travelPackageNew.getStartingDate())) {
 
             TravelPackageDTO oldTravelPackageDTO = objectMapper.convertValue(travelPackageOld, TravelPackageDTO.class);
-            travelPackageNew.getBookings().forEach(booking -> {
-                        CustomerDTO customerDTO = objectMapper.convertValue(booking.getCustomer(), CustomerDTO.class);
-                        BookingDTO bookingDTO = objectMapper.convertValue(booking, BookingDTO.class);
-                        emailService.sendItineraryChangeEmail(customerDTO, bookingDTO, oldTravelPackageDTO, travelPackageResponseDTO);
-                    }
-            );
+            List<Booking> bookings = travelPackageNew.getBookings();
+            if (bookings != null) {
+                bookings.forEach(booking -> {
+                            CustomerDTO customerDTO = objectMapper.convertValue(booking.getCustomer(), CustomerDTO.class);
+                            BookingDTO bookingDTO = objectMapper.convertValue(booking, BookingDTO.class);
+                            emailService.sendItineraryChangeEmail(customerDTO, bookingDTO, oldTravelPackageDTO, travelPackageResponseDTO);
+                        }
+                );
+            }
         }
-
         return travelPackageResponseDTO;
     }
 
