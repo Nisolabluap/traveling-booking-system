@@ -13,9 +13,7 @@ import application.com.orangeteam.models.entities.TravelPackage;
 import application.com.orangeteam.repositories.TravelPackageRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.persistence.EntityNotFoundException;
-import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -30,33 +28,10 @@ public class TravelPackageServiceImpl implements TravelPackageService {
     private final EmailService emailService;
     private final ObjectMapper objectMapper;
 
-    @Autowired
     public TravelPackageServiceImpl(TravelPackageRepository travelPackageRepository, EmailService emailService, ObjectMapper objectMapper) {
         this.travelPackageRepository = travelPackageRepository;
         this.emailService = emailService;
         this.objectMapper = objectMapper;
-    }
-
-    @NotNull
-    private static TravelPackage updateTravelPackageInfo(TravelPackageDTO packageDTO, TravelPackage oldPackage) {
-        oldPackage.setName(packageDTO.getName());
-        oldPackage.setDestination(packageDTO.getDestination());
-        oldPackage.setDescription(packageDTO.getDescription());
-        oldPackage.setPricePerPersonBeforeDiscount(packageDTO.getPricePerPersonBeforeDiscount());
-        oldPackage.setDiscountPercent(packageDTO.getDiscountPercent());
-        oldPackage.setStartingDate(packageDTO.getStartingDate());
-        oldPackage.setEndingDate(packageDTO.getEndingDate());
-        oldPackage.setAvailableReservations(packageDTO.getAvailableReservations());
-        return oldPackage;
-    }
-
-    private int calculateDuration(LocalDate startingDate, LocalDate endingDate) {
-        Period period = Period.between(startingDate, endingDate);
-        int days = period.getDays();
-        int months = period.getMonths();
-        int years = period.getYears();
-
-        return years * 365 + months * 30 + days;
     }
 
     @Override
@@ -69,7 +44,7 @@ public class TravelPackageServiceImpl implements TravelPackageService {
 
     @Override
     public TravelPackageDTO createTravelPackage(TravelPackageDTO packageDTO) {
-        if (!isValid(packageDTO)) {
+        if (isNotValid(packageDTO)) {
             throw new TravelPackageCreateException("Invalid dates");
         }
         if (isDuplicate(packageDTO)) {
@@ -85,31 +60,29 @@ public class TravelPackageServiceImpl implements TravelPackageService {
 
     @Override
     public TravelPackageDTO updateTravelPackage(Long id, TravelPackageDTO packageDTO) {
-        if (!isValid(packageDTO)) {
+        if (isNotValid(packageDTO)) {
             throw new TravelPackageCreateException("Invalid dates");
         }
-
         TravelPackage travelPackageOld = travelPackageRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Travel package with ID " + id + " not found"));
 
-
-        TravelPackage travelPackageNew = updateTravelPackageInfo(packageDTO, travelPackageOld);
+        TravelPackage travelPackageNew = convertToEntity(packageDTO);
         TravelPackageDTO travelPackageResponseDTO = convertToDTO(travelPackageRepository.save(travelPackageNew));
+        int duration = calculateDuration(travelPackageResponseDTO.getStartingDate(), travelPackageResponseDTO.getEndingDate());
+        travelPackageResponseDTO.setDuration(duration);
 
         if (!travelPackageOld.getDestination().equals(travelPackageNew.getDestination())
                 || !travelPackageOld.getStartingDate().isEqual(travelPackageNew.getStartingDate())
                 || !travelPackageOld.getEndingDate().isEqual(travelPackageNew.getStartingDate())) {
-            TravelPackageDTO oldTravelPackageDTO = objectMapper.convertValue(travelPackageOld, TravelPackageDTO.class);
 
-            travelPackageNew.getBookings().forEach((booking) -> {
+            TravelPackageDTO oldTravelPackageDTO = objectMapper.convertValue(travelPackageOld, TravelPackageDTO.class);
+            travelPackageNew.getBookings().forEach(booking -> {
                         CustomerDTO customerDTO = objectMapper.convertValue(booking.getCustomer(), CustomerDTO.class);
                         BookingDTO bookingDTO = objectMapper.convertValue(booking, BookingDTO.class);
                         emailService.sendItineraryChangeEmail(customerDTO, bookingDTO, oldTravelPackageDTO, travelPackageResponseDTO);
                     }
             );
         }
-        int duration = calculateDuration(travelPackageResponseDTO.getStartingDate(), travelPackageResponseDTO.getEndingDate());
-        travelPackageResponseDTO.setDuration(duration);
 
         return travelPackageResponseDTO;
     }
@@ -136,18 +109,6 @@ public class TravelPackageServiceImpl implements TravelPackageService {
         } else {
             throw new EntityNotFoundException("Travel package with ID " + id + " not found");
         }
-    }
-
-    private TravelPackageDTO convertToDTO(TravelPackage travelPackage) {
-        TravelPackageDTO packageDTO = new TravelPackageDTO();
-        BeanUtils.copyProperties(travelPackage, packageDTO);
-        return packageDTO;
-    }
-
-    private TravelPackage convertToEntity(TravelPackageDTO packageDTO) {
-        TravelPackage travelPackage = new TravelPackage();
-        BeanUtils.copyProperties(packageDTO, travelPackage);
-        return travelPackage;
     }
 
     @Override
@@ -177,7 +138,6 @@ public class TravelPackageServiceImpl implements TravelPackageService {
     @Override
     public List<TravelPackageDTO> getTravelPackageByDestination(String destination) {
         List<TravelPackage> travelPackages = travelPackageRepository.findByDestination(destination);
-
         if (travelPackages.isEmpty()) {
             throw new EntityNotFoundException("No travel packages found for destination: " + destination);
         }
@@ -187,10 +147,9 @@ public class TravelPackageServiceImpl implements TravelPackageService {
                 .toList();
     }
 
-
-    private boolean isValid(TravelPackageDTO travelPackageDTO) {
-        return travelPackageDTO.getStartingDate().isAfter(LocalDate.now()) &&
-                travelPackageDTO.getStartingDate().plusDays(2).isBefore(travelPackageDTO.getEndingDate());
+    private boolean isNotValid(TravelPackageDTO travelPackageDTO) {
+        return !travelPackageDTO.getStartingDate().isAfter(LocalDate.now()) ||
+                !travelPackageDTO.getStartingDate().plusDays(2).isBefore(travelPackageDTO.getEndingDate());
     }
 
     private boolean isDuplicate(TravelPackageDTO travelPackageDTO) {
@@ -202,5 +161,26 @@ public class TravelPackageServiceImpl implements TravelPackageService {
                 travelPackageDTO.getEndingDate()
         );
         return existingPackage != null;
+    }
+
+    private TravelPackageDTO convertToDTO(TravelPackage travelPackage) {
+        TravelPackageDTO packageDTO = new TravelPackageDTO();
+        BeanUtils.copyProperties(travelPackage, packageDTO);
+        return packageDTO;
+    }
+
+    private TravelPackage convertToEntity(TravelPackageDTO packageDTO) {
+        TravelPackage travelPackage = new TravelPackage();
+        BeanUtils.copyProperties(packageDTO, travelPackage);
+        return travelPackage;
+    }
+
+    private int calculateDuration(LocalDate startingDate, LocalDate endingDate) {
+        Period period = Period.between(startingDate, endingDate);
+        int days = period.getDays();
+        int months = period.getMonths();
+        int years = period.getYears();
+
+        return years * 365 + months * 30 + days;
     }
 }
