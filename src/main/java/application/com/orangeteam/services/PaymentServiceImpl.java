@@ -2,13 +2,12 @@ package application.com.orangeteam.services;
 
 import application.com.orangeteam.exceptions.booking_exceptions.BookingNotFoundException;
 import application.com.orangeteam.exceptions.payment_exceptions.PaymentStatusNotBookedException;
+import application.com.orangeteam.models.dtos.CustomerDTO;
 import application.com.orangeteam.models.dtos.PaymentDTO;
-import application.com.orangeteam.models.entities.Booking;
-import application.com.orangeteam.models.entities.BookingStatus;
-import application.com.orangeteam.models.entities.Payment;
-import application.com.orangeteam.models.entities.PaymentStatus;
+import application.com.orangeteam.models.entities.*;
 import application.com.orangeteam.repositories.BookingRepository;
 import application.com.orangeteam.repositories.PaymentRepository;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -22,10 +21,14 @@ public class PaymentServiceImpl implements PaymentService {
     private final PaymentRepository paymentRepository;
     private final BookingRepository bookingRepository;
     private final Random random = new Random();
+    private final EmailService emailService;
+    private final ObjectMapper objectMapper;
 
-    public PaymentServiceImpl(PaymentRepository paymentRepository, BookingRepository bookingRepository) {
+    public PaymentServiceImpl(PaymentRepository paymentRepository, BookingRepository bookingRepository, EmailService emailService, ObjectMapper objectMapper) {
         this.paymentRepository = paymentRepository;
         this.bookingRepository = bookingRepository;
+        this.emailService = emailService;
+        this.objectMapper = objectMapper;
     }
 
     public PaymentDTO processPayment(String creditCardNumber, Long bookingId) {
@@ -33,9 +36,12 @@ public class PaymentServiceImpl implements PaymentService {
                 .orElseThrow(() -> new BookingNotFoundException("Booking with id " + bookingId + "not found"));
         if (booking.getBookingStatus() == BookingStatus.PAID) {
             throw new PaymentStatusNotBookedException("Booking already payed.");
-        } else if(booking.getBookingStatus() == BookingStatus.CANCELLED) {
+        } else if (booking.getBookingStatus() == BookingStatus.CANCELLED) {
             throw new PaymentStatusNotBookedException("Booking is canceled.");
         }
+
+        Customer customer = booking.getCustomer();
+        CustomerDTO customerDTO = objectMapper.convertValue(customer, CustomerDTO.class);
 
         double price = booking.getPriceTotal();
 
@@ -45,13 +51,15 @@ public class PaymentServiceImpl implements PaymentService {
         payment.setTotalAmount(price);
         payment.setBooking(booking);
 
-        if (makePayment(price, creditCardNumber)) {
+        boolean paymentSuccessful = makePayment(price, creditCardNumber);
+        if (paymentSuccessful) {
             payment.setPaymentStatus(PaymentStatus.SUCCESSFUL);
             booking.setBookingStatus(BookingStatus.PAID);
             bookingRepository.save(booking);
         } else {
             payment.setPaymentStatus(PaymentStatus.FAILED);
         }
+
         Payment paymentEntity = paymentRepository.save(payment);
         PaymentDTO paymentResponseDTO = new PaymentDTO();
         paymentResponseDTO.setId(paymentEntity.getId());
@@ -60,6 +68,13 @@ public class PaymentServiceImpl implements PaymentService {
         paymentResponseDTO.setBookingID(paymentEntity.getBooking().getId());
         paymentResponseDTO.setBankAccountInfo(paymentEntity.getBankAccountInfo());
         paymentResponseDTO.setPaymentStatus(paymentEntity.getPaymentStatus());
+
+        if (paymentSuccessful) {
+            emailService.sendPaymentReceiptEmail(
+                    customerDTO, paymentResponseDTO);
+        } else {
+            emailService.sendPaymentFailedEmail(customerDTO, paymentResponseDTO);
+        }
 
         return paymentResponseDTO;
     }

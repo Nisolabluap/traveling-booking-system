@@ -50,6 +50,7 @@ class PaymentControllerTest {
     void makePaymentShouldPass() throws Exception {
         Customer customer = new Customer();
         customer.setId(1L);
+        customer.setEmail("adrian.puscu@techie.com");
         customerRepository.save(customer);
 
         TravelPackage travelPackage = new TravelPackage();

@@ -6,11 +6,13 @@ import application.com.orangeteam.exceptions.booking_exceptions.DuplicateBooking
 import application.com.orangeteam.exceptions.customer_exceptions.CustomerNotFoundException;
 import application.com.orangeteam.exceptions.travelpackage_exceptions.TravelPackageNotFoundException;
 import application.com.orangeteam.models.dtos.BookingDTO;
+import application.com.orangeteam.models.dtos.CustomerDTO;
 import application.com.orangeteam.models.entities.*;
 import application.com.orangeteam.repositories.BookingRepository;
 import application.com.orangeteam.repositories.CustomerRepository;
 import application.com.orangeteam.repositories.PaymentRepository;
 import application.com.orangeteam.repositories.TravelPackageRepository;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.transaction.Transactional;
 import jakarta.validation.constraints.NotNull;
 import lombok.extern.slf4j.Slf4j;
@@ -28,18 +30,22 @@ public class BookingServiceImpl implements BookingService {
     private final BookingRepository bookingRepository;
     private final PaymentRepository paymentRepository;
     private final PaymentService paymentService;
+    private final EmailService emailService;
+    private final ObjectMapper objectMapper;
 
     public BookingServiceImpl(
             CustomerRepository customerRepository,
             TravelPackageRepository travelPackageRepository,
             BookingRepository bookingRepository,
             PaymentRepository paymentRepository,
-            PaymentService paymentService) {
+            PaymentService paymentService, EmailService emailService, ObjectMapper objectMapper) {
         this.customerRepository = customerRepository;
         this.travelPackageRepository = travelPackageRepository;
         this.bookingRepository = bookingRepository;
         this.paymentRepository = paymentRepository;
         this.paymentService = paymentService;
+        this.emailService = emailService;
+        this.objectMapper = objectMapper;
     }
 
     @Override
@@ -72,7 +78,14 @@ public class BookingServiceImpl implements BookingService {
         booking.setBookingStatus(BookingStatus.BOOKED);
         Booking bookingEntity = bookingRepository.save(booking);
 
-        return convertToDTO(bookingEntity);
+        BookingDTO bookingResponseDTO = convertToDTO(bookingEntity);
+
+        emailService.sendBookingConfirmationEmail(
+                objectMapper.convertValue(customer, CustomerDTO.class),
+                bookingResponseDTO
+        );
+
+        return bookingResponseDTO;
     }
 
     private double calculateTotal(int numTravelers, double pricePerPersonBeforeDiscount, int discountPercent) {

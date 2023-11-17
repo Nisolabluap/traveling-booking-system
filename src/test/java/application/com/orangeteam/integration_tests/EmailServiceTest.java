@@ -26,7 +26,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 @Transactional
 @AutoConfigureTestDatabase
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
-public class EmailServiceTest {
+class EmailServiceTest {
 
     @Autowired
     EmailService emailService;
@@ -65,11 +65,11 @@ public class EmailServiceTest {
         paymentDTO.setAmount(2000);
         paymentDTO.setPaymentStatus(PaymentStatus.SUCCESSFUL);
 
-//        emailService.sendWelcomeEmail(customerDTO);
-//        emailService.sendBookingConfirmationEmail(customerDTO, bookingDTO);
-//        emailService.sendPaymentReceiptEmail(customerDTO, paymentDTO);
-//        emailService.sendPaymentFailedEmail(customerDTO, paymentDTO);
-//        emailService.sendItineraryChangeEmail(customerDTO, bookingDTO, oldTravelPackageDTO, updatedTravelPackageDTO);
+        emailService.sendWelcomeEmail(customerDTO);
+        emailService.sendBookingConfirmationEmail(customerDTO, bookingDTO);
+        emailService.sendPaymentReceiptEmail(customerDTO, paymentDTO);
+        emailService.sendPaymentFailedEmail(customerDTO, paymentDTO);
+        emailService.sendItineraryChangeEmail(customerDTO, bookingDTO, oldTravelPackageDTO, updatedTravelPackageDTO);
         assertTrue(true);
     }
 }
