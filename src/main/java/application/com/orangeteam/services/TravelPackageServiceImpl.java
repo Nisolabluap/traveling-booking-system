@@ -71,6 +71,7 @@ public class TravelPackageServiceImpl implements TravelPackageService {
                 .orElseThrow(() -> new EntityNotFoundException("Travel package with ID " + id + " not found"));
 
         TravelPackage travelPackageNew = convertToEntity(packageDTO);
+        travelPackageNew.setId(id);
         TravelPackageDTO travelPackageResponseDTO = convertToDTO(travelPackageRepository.save(travelPackageNew));
         int duration = calculateDuration(travelPackageResponseDTO.getStartingDate(), travelPackageResponseDTO.getEndingDate());
         travelPackageResponseDTO.setDuration(duration);
@@ -89,9 +90,6 @@ public class TravelPackageServiceImpl implements TravelPackageService {
                         }
                 );
             }
-
-            int updatedDuration = calculateDuration(travelPackageResponseDTO.getStartingDate(), travelPackageResponseDTO.getEndingDate());
-            travelPackageResponseDTO.setDuration(updatedDuration);
         }
         return travelPackageResponseDTO;
     }
