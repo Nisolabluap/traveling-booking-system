@@ -20,7 +20,7 @@ public class TravelPackageDTO {
     @NotEmpty(message = "This field must not be empty!")
     private String description;
 
-    @NotEmpty(message = "This field must not be empty")
+    @NotNull(message = "This field must not be null")
     @Min(value = 0, message = "Available reservations must be greater than or equal to 0")
     private int availableReservations;
 
@@ -33,10 +33,10 @@ public class TravelPackageDTO {
     @Min(value = 0, message = "Discount percentage cannot be negative.")
     private int discountPercent;
 
-    @NotEmpty(message = "This field must not be empty!")
+    @NotNull(message = "This field must not be null!")
     private LocalDate startingDate;
 
-    @NotEmpty(message = "This field must not be empty!")
+    @NotNull(message = "This field must not be null!")
     private LocalDate endingDate;
 
 }
