@@ -16,8 +16,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.transaction.Transactional;
 import jakarta.validation.constraints.NotNull;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -62,6 +64,9 @@ public class BookingServiceImpl implements BookingService {
                 .orElseThrow(() -> new TravelPackageNotFoundException("Invalid travel package ID"));
         Customer customer = customerRepository.findById(bookingDTO.getCustomerID())
                 .orElseThrow(() -> new CustomerNotFoundException("Invalid customer id."));
+        CustomerDTO customerDTO = new CustomerDTO();
+        customerDTO.setFirstName(customer.getFirstName());
+        customerDTO.setEmail(customer.getFirstName());
 
         travelPackage.setAvailableReservations(travelPackage.getAvailableReservations() - bookingDTO.getNumTravelers());
         travelPackage = travelPackageRepository.save(travelPackage);
@@ -76,36 +81,14 @@ public class BookingServiceImpl implements BookingService {
         booking.setNumTravelers(bookingDTO.getNumTravelers());
         booking.setPriceTotal(priceTotal);
         booking.setBookingStatus(BookingStatus.BOOKED);
+        booking.setCreatedAt(LocalDateTime.now());
         Booking bookingEntity = bookingRepository.save(booking);
 
         BookingDTO bookingResponseDTO = convertToDTO(bookingEntity);
 
-        emailService.sendBookingConfirmationEmail(
-                objectMapper.convertValue(customer, CustomerDTO.class),
-                bookingResponseDTO
-        );
+        emailService.sendBookingConfirmationEmail(customerDTO, bookingResponseDTO);
 
         return bookingResponseDTO;
-    }
-
-    private double calculateTotal(int numTravelers, double pricePerPersonBeforeDiscount, int discountPercent) {
-        double totalBeforeDiscount = numTravelers * pricePerPersonBeforeDiscount;
-        double discountAmount = totalBeforeDiscount * discountPercent / 100;
-        return totalBeforeDiscount - discountAmount;
-    }
-
-    private boolean isDuplicate(BookingDTO bookingDTO) {
-        return bookingRepository.existsByCustomerAndTravelPackage(
-                customerRepository.findById(bookingDTO.getCustomerID())
-                        .orElseThrow(() -> new CustomerNotFoundException("Customer not found")),
-                travelPackageRepository.findById(bookingDTO.getTravelPackageID())
-                        .orElseThrow(() -> new TravelPackageNotFoundException("Travel package not found")));
-
-    }
-
-    private boolean checkIfAvailableReservations(int numTravelers, Long travelPackageId) {
-        TravelPackage travelPackage = travelPackageRepository.getReferenceById(travelPackageId);
-        return numTravelers <= travelPackage.getAvailableReservations();
     }
 
     @Override
@@ -208,14 +191,40 @@ public class BookingServiceImpl implements BookingService {
         return convertToDTO(canceledBooking);
     }
 
+    private boolean checkIfAvailableReservations(int numTravelers, Long travelPackageId) {
+        TravelPackage travelPackage = travelPackageRepository.getReferenceById(travelPackageId);
+        return numTravelers <= travelPackage.getAvailableReservations();
+    }
+
     private BookingDTO convertToDTO(Booking booking) {
         BookingDTO bookingDTO = new BookingDTO();
-        booking.setId(booking.getId());
+        bookingDTO.setId(booking.getId());
         bookingDTO.setCustomerID(booking.getCustomer().getId());
         bookingDTO.setTravelPackageID(booking.getTravelPackage().getId());
-        booking.setNumTravelers(booking.getNumTravelers());
+        bookingDTO.setNumTravelers(booking.getNumTravelers());
         bookingDTO.setPriceTotal(booking.getPriceTotal());
         bookingDTO.setBookingStatus(booking.getBookingStatus());
         return bookingDTO;
+    }
+
+    private double calculateTotal(int numTravelers, double pricePerPersonBeforeDiscount, int discountPercent) {
+        double totalBeforeDiscount = numTravelers * pricePerPersonBeforeDiscount;
+        double discountAmount = totalBeforeDiscount * discountPercent / 100;
+        return totalBeforeDiscount - discountAmount;
+    }
+
+    private boolean isDuplicate(BookingDTO bookingDTO) {
+        return bookingRepository.existsByCustomerAndTravelPackage(
+                customerRepository.findById(bookingDTO.getCustomerID())
+                        .orElseThrow(() -> new CustomerNotFoundException("Customer not found")),
+                travelPackageRepository.findById(bookingDTO.getTravelPackageID())
+                        .orElseThrow(() -> new TravelPackageNotFoundException("Travel package not found")));
+
+    }
+
+    @Scheduled(fixedDelay = 60 * 1 * 1000)
+    public void cancelExpiredBookings() {
+        List<Booking> expiredBookings = bookingRepository.findByBookingStatusAndCreatedAtBefore(BookingStatus.BOOKED, LocalDateTime.now().minusMinutes(3));
+        expiredBookings.forEach(booking -> cancel(booking.getId()));
     }
 }

@@ -3,6 +3,7 @@ package application.com.orangeteam.models.entities;
 import jakarta.persistence.*;
 import lombok.Data;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -31,8 +32,10 @@ public class Booking {
     @Column(name = "price_total")
     private double priceTotal;
 
+    @Column
+    private LocalDateTime createdAt;
+
     @Enumerated(EnumType.STRING)
     @Column(name = "booking_status")
     private BookingStatus bookingStatus;
-
 }
