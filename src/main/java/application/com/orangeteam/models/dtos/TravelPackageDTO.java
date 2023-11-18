@@ -21,13 +21,13 @@ public class TravelPackageDTO {
     private String description;
 
     @NotNull(message = "This field must not be null")
-    @Min(value = 0, message = "Available reservations must be greater than or equal to 0")
+    @Min(value = 1, message = "Available reservations must be greater than or equal to 1")
     private int availableReservations;
 
     private int duration;
 
     @NotNull(message = "Price must not be null")
-    @Min(value = 0, message = "Price must be greater than or equal to 0")
+    @Min(value = 1, message = "Price must be greater than or equal to 1")
     private double pricePerPersonBeforeDiscount;
 
     @Min(value = 0, message = "Discount percentage cannot be negative.")
