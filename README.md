@@ -25,6 +25,10 @@ travel agency staff and customers.
 | `name   ` | `string` | 
 | `destination   ` | `string` | 
 | `description   ` | `string` | 
+| `pricePerPersonBeforeDiscount  ` | `double` | 
+| `discountPercent   ` | `int` | 
+| `startingDate   ` | `LocalDate` | 
+| `endingDate  ` | `LocalDate` | 
 | `availableReservations   ` | `int` | 
 
 #### Get All Travel Packages
@@ -75,7 +79,7 @@ travel agency staff and customers.
 ```http
   POST /api/customers
 ```
-#### Get all customers"
+#### Get all customers
 
 ```http
   GET /api/customers
@@ -101,8 +105,7 @@ GET/api/customers/{id}
 | :-------- | :------- | 
 | `customerID   ` | `long` | 
 | `travelPackageID   ` | `long` | 
-| `numTravelers  ` | `int` | 
-| `availableReservations   ` | `int` | 
+| `numTravelers  ` | `int` |  
 
 #### Get Booking By ID
 
@@ -120,10 +123,6 @@ GET/api/customers/{id}
 #### Get Booking By Destination
 ```http
   GET/api/bookings/params = "destination"
-```
-#### Create Booking
-```http
-  POST/api/bookings
 ```
 #### Create Booking
 ```http
