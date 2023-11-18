@@ -51,8 +51,6 @@ public class TravelPackageServiceImpl implements TravelPackageService {
             throw new DuplicateTravelPackageException("Travel package already exists");
         }
 
-        int duration = calculateDuration(packageDTO.getStartingDate(), packageDTO.getEndingDate());
-        packageDTO.setDuration(duration);
         TravelPackage savedPackage = travelPackageRepository.save(convertToEntity(packageDTO));
 
         TravelPackageDTO savedPackageDTO = convertToDTO(savedPackage);
