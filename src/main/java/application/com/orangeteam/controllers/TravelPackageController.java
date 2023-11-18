@@ -2,11 +2,12 @@ package application.com.orangeteam.controllers;
 
 import application.com.orangeteam.models.dtos.TravelPackageDTO;
 import application.com.orangeteam.services.TravelPackageService;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
@@ -15,84 +16,125 @@ import org.springframework.web.bind.annotation.*;
 import java.time.LocalDate;
 import java.util.List;
 
-@Api(value = "Travel Package API", description = "Operations for managing travel packages")
 @RestController
 @RequestMapping("/api/travel-packages")
+@Tag(name = "Travel package API", description = "Endpoints for managing travel packages")
 public class TravelPackageController {
+
     @Autowired
     private TravelPackageService travelPackageService;
 
-    @ApiOperation(value = "Get all travel packages")
-    @ApiResponses({
-            @ApiResponse(code = 200, message = "Travel packages retrieved successfully"),
-            @ApiResponse(code = 500, message = "Internal Server Error")
-    })
     @GetMapping
+    @Operation(
+            summary = "Get all travel packages",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Travel packages retrieved successfully"),
+                    @ApiResponse(responseCode = "500", description = "Internal Server Error")
+            }
+    )
     public List<TravelPackageDTO> getAllTravelPackages() {
         return travelPackageService.getAllTravelPackages();
     }
 
-    @ApiOperation(value = "Create a new travel package")
-    @ApiResponses({
-            @ApiResponse(code = 200, message = "Travel package created successfully"),
-            @ApiResponse(code = 400, message = "Bad Request"),
-            @ApiResponse(code = 500, message = "Internal Server Error")
-    })
     @PostMapping
-    public TravelPackageDTO createTravelPackage(@RequestBody TravelPackageDTO packageDTO) {
+    @Operation(
+            summary = "Create a new travel package",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Travel package created successfully"),
+                    @ApiResponse(responseCode = "400", description = "Bad Request"),
+                    @ApiResponse(responseCode = "500", description = "Internal Server Error")
+            }
+    )
+    public TravelPackageDTO createTravelPackage(@RequestBody @Valid TravelPackageDTO packageDTO) {
         return travelPackageService.createTravelPackage(packageDTO);
     }
 
-    @ApiOperation(value = "Update a travel package by ID")
-    @ApiResponses({
-            @ApiResponse(code = 200, message = "Travel package updated successfully"),
-            @ApiResponse(code = 400, message = "Bad Request"),
-            @ApiResponse(code = 404, message = "Travel package not found"),
-            @ApiResponse(code = 500, message = "Internal Server Error")
-    })
     @PutMapping("/{id}")
-    public TravelPackageDTO updateTravelPackage(@PathVariable Long id, @RequestBody TravelPackageDTO packageDTO) {
+    @Operation(
+            summary = "Update a travel package by ID",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Travel package updated successfully"),
+                    @ApiResponse(responseCode = "400", description = "Bad Request"),
+                    @ApiResponse(responseCode = "404", description = "Travel package not found"),
+                    @ApiResponse(responseCode = "500", description = "Internal Server Error")
+            }
+    )
+    public TravelPackageDTO updateTravelPackage(
+            @Parameter(description = "ID of the travel package") @PathVariable Long id,
+            @RequestBody @Valid TravelPackageDTO packageDTO) {
         return travelPackageService.updateTravelPackage(id, packageDTO);
     }
 
-    @ApiOperation(value = "Delete a travel package by ID")
-    @ApiResponses({
-            @ApiResponse(code = 204, message = "Travel package deleted successfully"),
-            @ApiResponse(code = 404, message = "Travel package not found"),
-            @ApiResponse(code = 500, message = "Internal Server Error")
-    })
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteTravelPackage(@PathVariable Long id) {
+    @Operation(
+            summary = "Delete a travel package by ID",
+            responses = {
+                    @ApiResponse(responseCode = "204", description = "Travel package deleted successfully"),
+                    @ApiResponse(responseCode = "404", description = "Travel package not found"),
+                    @ApiResponse(responseCode = "500", description = "Internal Server Error")
+            }
+    )
+    public ResponseEntity<Void> deleteTravelPackage(
+            @Parameter(description = "ID of the travel package") @PathVariable Long id) {
         travelPackageService.deleteTravelPackage(id);
         return ResponseEntity.noContent().build();
     }
 
-    @ApiOperation(value = "Get a travel package by ID")
-    @ApiResponses({
-            @ApiResponse(code = 200, message = "Travel package retrieved successfully"),
-            @ApiResponse(code = 404, message = "Travel package not found"),
-            @ApiResponse(code = 500, message = "Internal Server Error")
-    })
     @GetMapping("/{id}")
-    public TravelPackageDTO getTravelPackage(@PathVariable Long id) {
+    @Operation(
+            summary = "Get a travel package by ID",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Travel package retrieved successfully"),
+                    @ApiResponse(responseCode = "404", description = "Travel package not found"),
+                    @ApiResponse(responseCode = "500", description = "Internal Server Error")
+            }
+    )
+    public TravelPackageDTO getTravelPackage(
+            @Parameter(description = "ID of the travel package") @PathVariable Long id) {
         return travelPackageService.getTravelPackageById(id);
     }
 
     @GetMapping("/between-dates")
+    @Operation(
+            summary = "Get travel packages between specified dates",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Travel packages retrieved successfully"),
+                    @ApiResponse(responseCode = "500", description = "Internal Server Error")
+            }
+    )
     public ResponseEntity<List<TravelPackageDTO>> getTravelPackagesBetweenDates(
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startingDate,
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endingDate,
-            @RequestParam(defaultValue = "true") boolean ascending) {
+            @Parameter(description = "Start date for filtering") @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startingDate,
+            @Parameter(description = "End date for filtering") @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endingDate,
+            @Parameter(description = "Ascending order flag") @RequestParam(defaultValue = "true") boolean ascending) {
         return ResponseEntity.ok(travelPackageService.getTravelPackageBetweenDates(startingDate, endingDate, ascending));
     }
 
     @GetMapping("/by-price-range")
-    public ResponseEntity<List<TravelPackageDTO>> getTravelPackageWithPriceBetweenTwoValues(@RequestParam double minPrice, @RequestParam double maxPrice) {
+    @Operation(
+            summary = "Get travel packages within a specified price range",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Travel packages retrieved successfully"),
+                    @ApiResponse(responseCode = "500", description = "Internal Server Error")
+            }
+    )
+    public ResponseEntity<List<TravelPackageDTO>> getTravelPackageWithPriceBetweenTwoValues(
+            @Parameter(description = "Minimum price for filtering") @RequestParam double minPrice,
+            @Parameter(description = "Maximum price for filtering") @RequestParam double maxPrice) {
         return ResponseEntity.ok(travelPackageService.getTravelPackageWithPriceBetweenTwoValues(minPrice, maxPrice));
     }
 
     @GetMapping("/by-destination")
-    public ResponseEntity<List<TravelPackageDTO>> getTravelPackagesByDestination(@RequestParam String destination) {
+    @Operation(
+            summary = "Get travel packages by destination",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Travel packages retrieved successfully"),
+                    @ApiResponse(responseCode = "404", description = "Travel package not found"),
+                    @ApiResponse(responseCode = "400", description = "Bad Request"),
+                    @ApiResponse(responseCode = "500", description = "Internal Server Error")
+            }
+    )
+    public ResponseEntity<List<TravelPackageDTO>> getTravelPackagesByDestination(
+            @Parameter(description = "Destination for filtering") @RequestParam @Valid String destination) {
         try {
             List<TravelPackageDTO> travelPackages = travelPackageService.getTravelPackageByDestination(destination);
             return ResponseEntity.ok(travelPackages);
