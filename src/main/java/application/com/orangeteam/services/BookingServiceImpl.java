@@ -2,6 +2,7 @@ package application.com.orangeteam.services;
 
 import application.com.orangeteam.exceptions.booking_exceptions.BookingCreateException;
 import application.com.orangeteam.exceptions.booking_exceptions.BookingNotFoundException;
+import application.com.orangeteam.exceptions.booking_exceptions.BookingUpdateException;
 import application.com.orangeteam.exceptions.booking_exceptions.DuplicateBookingException;
 import application.com.orangeteam.exceptions.customer_exceptions.CustomerNotFoundException;
 import application.com.orangeteam.exceptions.travelpackage_exceptions.TravelPackageNotFoundException;
@@ -140,7 +141,7 @@ public class BookingServiceImpl implements BookingService {
         TravelPackage travelPackage = travelPackageRepository.findById(bookingToBeUpdated.getTravelPackage().getId()).get();
 
         if (bookingToBeUpdated.getBookingStatus() != BookingStatus.BOOKED) {
-            throw new DuplicateBookingException("Cannot modify payed or canceled booking");
+            throw new BookingUpdateException("Cannot modify payed or canceled booking");
         }
         int travelersModifier = numTravelers - bookingToBeUpdated.getNumTravelers();
         if (travelersModifier > 0) {
@@ -222,7 +223,7 @@ public class BookingServiceImpl implements BookingService {
 
     }
 
-    @Scheduled(fixedDelay = 60 * 1 * 1000)
+    @Scheduled(fixedDelay = 60 * 3 * 1000)
     public void cancelExpiredBookings() {
         List<Booking> expiredBookings = bookingRepository.findByBookingStatusAndCreatedAtBefore(BookingStatus.BOOKED, LocalDateTime.now().minusMinutes(3));
         expiredBookings.forEach(booking -> cancel(booking.getId()));

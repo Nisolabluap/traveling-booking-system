@@ -2,6 +2,7 @@ package application.com.orangeteam.exceptions;
 
 import application.com.orangeteam.exceptions.booking_exceptions.BookingCreateException;
 import application.com.orangeteam.exceptions.booking_exceptions.BookingNotFoundException;
+import application.com.orangeteam.exceptions.booking_exceptions.BookingUpdateException;
 import application.com.orangeteam.exceptions.booking_exceptions.DuplicateBookingException;
 import application.com.orangeteam.exceptions.customer_exceptions.CustomerCreateException;
 import application.com.orangeteam.exceptions.customer_exceptions.CustomerNotFoundException;
@@ -79,6 +80,11 @@ public class ExceptionHandlerAdvice  {
     @ExceptionHandler(DuplicateBookingException.class)
     public ResponseEntity<String> duplicateBookingException(DuplicateBookingException duplicateBookingException) {
         return new ResponseEntity<>(objectToString(Map.of("message", duplicateBookingException.getMessage())), CONFLICT);
+    }
+
+    @ExceptionHandler(BookingUpdateException.class)
+    public ResponseEntity<String> bookingUpdateException(BookingUpdateException bookingUpdateException) {
+        return new ResponseEntity<>(objectToString(Map.of("message", bookingUpdateException)), CONFLICT);
     }
 
     @ExceptionHandler(InvalidEmailFormatException.class)
