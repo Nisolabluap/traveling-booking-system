@@ -269,8 +269,8 @@ class BookingControllerTest {
                 .contentType(APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(bookingDTO2)));
 
-        MvcResult result = mockMvc.perform(get("/api/bookings")
-                .param("travelPackageID", "2"))
+        MvcResult result = mockMvc.perform(get("/api/bookings/by-travelPackage")
+                        .param("travelPackageID", "2"))
                 .andExpect(status().isOk())
                 .andReturn();
 
@@ -312,7 +312,7 @@ class BookingControllerTest {
                 .contentType(APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(bookingDTO2)));
 
-        MvcResult result = mockMvc.perform(get("/api/bookings")
+        MvcResult result = mockMvc.perform(get("/api/bookings/by-destination")
                         .param("destination", "London"))
                 .andExpect(status().isOk())
                 .andReturn();
@@ -333,8 +333,8 @@ class BookingControllerTest {
                 .contentType(APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(bookingDTO1)));
 
-        MvcResult result = mockMvc.perform(get("/api/bookings")
-                        .param("destination", "Urlati"))
+        MvcResult result = mockMvc.perform(get("/api/bookings/by-destination")
+                        .param("destination", "Nowhere"))
                 .andExpect(status().isOk())
                 .andReturn();
 

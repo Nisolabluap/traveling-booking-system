@@ -101,7 +101,7 @@ public class BookingController {
             }
     )
     public ResponseEntity<BookingDTO> updateNumTravelers(@Parameter(description = "ID of the booking") @PathVariable Long id,
-                                                         @RequestBody Integer numTravelers) {
+                                                         @RequestBody @Valid Integer numTravelers) {
         BookingDTO bookingResponseDTO = bookingService.updateNumTravelers(id, numTravelers);
         return ResponseEntity.ok(bookingResponseDTO);
     }
