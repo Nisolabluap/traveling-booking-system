@@ -119,8 +119,9 @@ public class TravelPackageController {
     )
     public ResponseEntity<List<TravelPackageDTO>> getTravelPackageWithPriceBetweenTwoValues(
             @Parameter(description = "Minimum price for filtering") @RequestParam double minPrice,
-            @Parameter(description = "Maximum price for filtering") @RequestParam double maxPrice) {
-        return ResponseEntity.ok(travelPackageService.getTravelPackageWithPriceBetweenTwoValues(minPrice, maxPrice));
+            @Parameter(description = "Maximum price for filtering") @RequestParam double maxPrice,
+            @Parameter(description = "Ascending order flag") @RequestParam(defaultValue = "true") boolean ascending) {
+        return ResponseEntity.ok(travelPackageService.getTravelPackageWithPriceBetweenTwoValues(minPrice, maxPrice, ascending));
     }
 
     @GetMapping("/by-destination")

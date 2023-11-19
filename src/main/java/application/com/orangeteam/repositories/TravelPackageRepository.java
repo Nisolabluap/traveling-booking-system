@@ -27,9 +27,15 @@ public interface TravelPackageRepository extends JpaRepository<TravelPackage, Lo
     );
 
     List<TravelPackage> findByDestination(String destination);
+
     List<TravelPackage> findByPricePerPersonBeforeDiscountBetween(double minPrice, double maxPrice);
+
     List<TravelPackage> findByStartingDateBetweenOrderByStartingDateAsc(LocalDate startingDate, LocalDate endingDate);
+
     List<TravelPackage> findByStartingDateBetweenOrderByStartingDateDesc(LocalDate startingDate, LocalDate endingDate);
 
+    List<TravelPackage> findByPricePerPersonBeforeDiscountBetweenOrderByPricePerPersonBeforeDiscountAsc(double minPrice, double maxPrice);
+
+    List<TravelPackage> findByPricePerPersonBeforeDiscountBetweenOrderByPricePerPersonBeforeDiscountDesc(double minPrice, double maxPrice);
 
 }
