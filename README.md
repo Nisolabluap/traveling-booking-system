@@ -116,13 +116,13 @@ GET/api/customers/{id}
 ```http
   GET/api/bookings/params = "customerID"
 ```
-#### Get Booking By Travel Package
+#### Get Booking By Travel Package ID
 ```http
-  GET/api/bookings/params = "travelPackageID"
+  GET/api/bookings/by-travelPackage"
 ```
 #### Get Booking By Destination
 ```http
-  GET/api/bookings/params = "destination"
+  GET/api/bookings/by-destination"
 ```
 #### Create Booking
 ```http
