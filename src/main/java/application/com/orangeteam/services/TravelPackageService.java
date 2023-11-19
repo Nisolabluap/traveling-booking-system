@@ -12,6 +12,6 @@ public interface TravelPackageService {
     void deleteTravelPackage(Long id);
     TravelPackageDTO getTravelPackageById(Long id);
     List<TravelPackageDTO> getTravelPackageBetweenDates(LocalDate startingDate, LocalDate endingDate, boolean ascending);
-    List<TravelPackageDTO> getTravelPackageWithPriceBetweenTwoValues(double minPrice, double maxPrice);
+    List<TravelPackageDTO> getTravelPackageWithPriceBetweenTwoValues(double minPrice, double maxPrice, boolean ascending);
     List<TravelPackageDTO> getTravelPackageByDestination(String destination);
 }

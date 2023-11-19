@@ -52,7 +52,7 @@ public class BookingController {
         return ResponseEntity.ok(bookingDTOLists);
     }
 
-    @GetMapping(params = "travelPackageID")
+    @GetMapping("/by-travelPackage")
     @Operation(
             summary = "Get bookings by travel package ID",
             responses = {
@@ -65,7 +65,7 @@ public class BookingController {
         return ResponseEntity.ok(bookingDTOLists);
     }
 
-    @GetMapping(params = "destination")
+    @GetMapping("/by-destination")
     @Operation(
             summary = "Get bookings by destination",
             responses = {

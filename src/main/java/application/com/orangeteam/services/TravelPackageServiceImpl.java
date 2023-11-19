@@ -132,8 +132,14 @@ public class TravelPackageServiceImpl implements TravelPackageService {
     }
 
     @Override
-    public List<TravelPackageDTO> getTravelPackageWithPriceBetweenTwoValues(double minPrice, double maxPrice) {
-        List<TravelPackage> filteredPackages = travelPackageRepository.findByPricePerPersonBeforeDiscountBetween(minPrice, maxPrice);
+    public List<TravelPackageDTO> getTravelPackageWithPriceBetweenTwoValues(double minPrice, double maxPrice, boolean ascending) {
+        List<TravelPackage> filteredPackages;
+
+        if (ascending) {
+            filteredPackages = travelPackageRepository.findByPricePerPersonBeforeDiscountBetweenOrderByPricePerPersonBeforeDiscountAsc(minPrice, maxPrice);
+        } else {
+            filteredPackages = travelPackageRepository.findByPricePerPersonBeforeDiscountBetweenOrderByPricePerPersonBeforeDiscountDesc(minPrice, maxPrice);
+        }
 
         return filteredPackages.stream()
                 .map(this::convertToDTO)
