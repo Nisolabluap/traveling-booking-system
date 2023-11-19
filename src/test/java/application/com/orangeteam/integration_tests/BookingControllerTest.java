@@ -26,6 +26,7 @@ import org.springframework.test.web.servlet.MvcResult;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
@@ -45,8 +46,6 @@ class BookingControllerTest {
     TravelPackageRepository travelPackageRepository;
     @Autowired
     CustomerRepository customerRepository;
-    @Autowired
-    BookingRepository bookingRepository;
     @Autowired
     MockMvc mockMvc;
     @Autowired
@@ -236,5 +235,154 @@ class BookingControllerTest {
         });
 
         assertSame(BookingStatus.CANCELLED, bookingResponseDTO.getBookingStatus());
+    }
+
+    @Test
+    void getBookingsByTravelPackageIdShouldPass() throws Exception {
+        TravelPackage travelPackage = new TravelPackage();
+        travelPackage.setId(2L);
+        travelPackage.setDestination("Paris");
+        travelPackage.setDescription("City by the Seine");
+        travelPackage.setBookings(new ArrayList<>());
+        travelPackage.setDiscountPercent(10);
+        travelPackage.setPricePerPersonBeforeDiscount(2000);
+        travelPackage.setAvailableReservations(100);
+        travelPackage.setStartingDate(LocalDate.of(2024, 1, 1));
+        travelPackage.setEndingDate(LocalDate.of(2024, 2, 1));
+        travelPackageRepository.save(travelPackage);
+
+        BookingDTO bookingDTO1 = new BookingDTO();
+        bookingDTO1.setCustomerID(1L);
+        bookingDTO1.setTravelPackageID(1L);
+        bookingDTO1.setNumTravelers(2);
+
+        BookingDTO bookingDTO2 = new BookingDTO();
+        bookingDTO2.setCustomerID(1L);
+        bookingDTO2.setTravelPackageID(2L);
+        bookingDTO2.setNumTravelers(2);
+
+        mockMvc.perform(post("/api/bookings")
+                .contentType(APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(bookingDTO1)));
+
+        mockMvc.perform(post("/api/bookings")
+                .contentType(APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(bookingDTO2)));
+
+        MvcResult result = mockMvc.perform(get("/api/bookings")
+                .param("travelPackageID", "2"))
+                .andExpect(status().isOk())
+                .andReturn();
+
+        String resultAsString = result.getResponse().getContentAsString();
+        List<BookingDTO> bookingDTOs = objectMapper.readValue(resultAsString, new TypeReference<>() {
+        });
+        assertEquals(1, bookingDTOs.size());
+    }
+
+    @Test
+    void getBookingsByDestinationShouldPass() throws Exception {
+        TravelPackage travelPackage = new TravelPackage();
+        travelPackage.setId(2L);
+        travelPackage.setDestination("London");
+        travelPackage.setDescription("City by the Thames");
+        travelPackage.setBookings(new ArrayList<>());
+        travelPackage.setDiscountPercent(10);
+        travelPackage.setPricePerPersonBeforeDiscount(2000);
+        travelPackage.setAvailableReservations(100);
+        travelPackage.setStartingDate(LocalDate.of(2025, 1, 1));
+        travelPackage.setEndingDate(LocalDate.of(2025, 2, 1));
+        travelPackageRepository.save(travelPackage);
+
+        BookingDTO bookingDTO1 = new BookingDTO();
+        bookingDTO1.setCustomerID(1L);
+        bookingDTO1.setTravelPackageID(1L);
+        bookingDTO1.setNumTravelers(2);
+
+        BookingDTO bookingDTO2 = new BookingDTO();
+        bookingDTO2.setCustomerID(1L);
+        bookingDTO2.setTravelPackageID(2L);
+        bookingDTO2.setNumTravelers(2);
+
+        mockMvc.perform(post("/api/bookings")
+                .contentType(APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(bookingDTO1)));
+
+        mockMvc.perform(post("/api/bookings")
+                .contentType(APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(bookingDTO2)));
+
+        MvcResult result = mockMvc.perform(get("/api/bookings")
+                        .param("destination", "London"))
+                .andExpect(status().isOk())
+                .andReturn();
+        String resultAsString = result.getResponse().getContentAsString();
+        List<BookingDTO> bookingDTOs = objectMapper.readValue(resultAsString, new TypeReference<>() {
+        });
+        assertEquals(2, bookingDTOs.size());
+    }
+
+    @Test
+    void getBookingsByInvalidDestinationShouldFail() throws Exception {
+        BookingDTO bookingDTO1 = new BookingDTO();
+        bookingDTO1.setCustomerID(1L);
+        bookingDTO1.setTravelPackageID(1L);
+        bookingDTO1.setNumTravelers(2);
+
+        mockMvc.perform(post("/api/bookings")
+                .contentType(APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(bookingDTO1)));
+
+        MvcResult result = mockMvc.perform(get("/api/bookings")
+                        .param("destination", "Urlati"))
+                .andExpect(status().isOk())
+                .andReturn();
+
+        String resultAsString = result.getResponse().getContentAsString();
+        List<BookingDTO> bookingDTOs = objectMapper.readValue(resultAsString, new TypeReference<>() {
+        });
+
+        assertTrue(bookingDTOs.isEmpty());
+    }
+
+    @Test
+    void getBookingsByCustomerIdShouldPass() throws Exception {
+        Customer customer = new Customer();
+        customer.setId(2L);
+        customer.setFirstName("Roland");
+        customer.setLastName("McDonald");
+        customer.setEmail("roland@donald.food");
+        customer.setPhoneNumber("0723987654");
+        customer.setBookings(new ArrayList<>());
+        customerRepository.save(customer);
+
+        BookingDTO bookingDTO1 = new BookingDTO();
+        bookingDTO1.setCustomerID(1L);
+        bookingDTO1.setTravelPackageID(1L);
+        bookingDTO1.setNumTravelers(2);
+
+        BookingDTO bookingDTO2 = new BookingDTO();
+        bookingDTO2.setCustomerID(2L);
+        bookingDTO2.setTravelPackageID(1L);
+        bookingDTO2.setNumTravelers(3);
+
+        mockMvc.perform(post("/api/bookings")
+                .contentType(APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(bookingDTO1)));
+
+        mockMvc.perform(post("/api/bookings")
+                .contentType(APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(bookingDTO2)));
+
+        MvcResult result = mockMvc.perform(get("/api/bookings")
+                        .param("customerID", "1"))
+                .andExpect(status().isOk())
+                .andReturn();
+
+        String resultAsString = result.getResponse().getContentAsString();
+        List<BookingDTO> bookingDTOs = objectMapper.readValue(resultAsString, new TypeReference<>() {
+        });
+
+        assertEquals(1, bookingDTOs.size());
     }
 }

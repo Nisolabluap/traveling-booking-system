@@ -34,21 +34,19 @@ public class BookingServiceImpl implements BookingService {
     private final PaymentRepository paymentRepository;
     private final PaymentService paymentService;
     private final EmailService emailService;
-    private final ObjectMapper objectMapper;
 
     public BookingServiceImpl(
             CustomerRepository customerRepository,
             TravelPackageRepository travelPackageRepository,
             BookingRepository bookingRepository,
             PaymentRepository paymentRepository,
-            PaymentService paymentService, EmailService emailService, ObjectMapper objectMapper) {
+            PaymentService paymentService, EmailService emailService) {
         this.customerRepository = customerRepository;
         this.travelPackageRepository = travelPackageRepository;
         this.bookingRepository = bookingRepository;
         this.paymentRepository = paymentRepository;
         this.paymentService = paymentService;
         this.emailService = emailService;
-        this.objectMapper = objectMapper;
     }
 
     @Override
