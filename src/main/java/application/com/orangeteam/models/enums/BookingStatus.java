@@ -1,4 +1,4 @@
-package application.com.orangeteam.models.entities;
+package application.com.orangeteam.models.enums;
 
 public enum BookingStatus {
 

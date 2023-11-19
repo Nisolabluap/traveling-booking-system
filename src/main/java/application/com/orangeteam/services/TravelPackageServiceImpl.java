@@ -8,7 +8,7 @@ import application.com.orangeteam.models.dtos.BookingDTO;
 import application.com.orangeteam.models.dtos.CustomerDTO;
 import application.com.orangeteam.models.dtos.TravelPackageDTO;
 import application.com.orangeteam.models.entities.Booking;
-import application.com.orangeteam.models.entities.BookingStatus;
+import application.com.orangeteam.models.enums.BookingStatus;
 import application.com.orangeteam.models.entities.TravelPackage;
 import application.com.orangeteam.repositories.TravelPackageRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;

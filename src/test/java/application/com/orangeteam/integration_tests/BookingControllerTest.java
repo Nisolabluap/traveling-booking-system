@@ -2,11 +2,10 @@ package application.com.orangeteam.integration_tests;
 
 import application.com.orangeteam.models.dtos.BookingDTO;
 import application.com.orangeteam.models.dtos.PaymentDTO;
-import application.com.orangeteam.models.entities.BookingStatus;
 import application.com.orangeteam.models.entities.Customer;
-import application.com.orangeteam.models.entities.PaymentStatus;
 import application.com.orangeteam.models.entities.TravelPackage;
-import application.com.orangeteam.repositories.BookingRepository;
+import application.com.orangeteam.models.enums.BookingStatus;
+import application.com.orangeteam.models.enums.PaymentStatus;
 import application.com.orangeteam.repositories.CustomerRepository;
 import application.com.orangeteam.repositories.TravelPackageRepository;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -199,8 +198,8 @@ class BookingControllerTest {
         boolean paymentSuccess = false;
         while (!paymentSuccess) {
             MvcResult result = mockMvc.perform(post("/api/payments")
-                    .contentType(APPLICATION_JSON)
-                    .content(objectMapper.writeValueAsString(paymentDTO)))
+                            .contentType(APPLICATION_JSON)
+                            .content(objectMapper.writeValueAsString(paymentDTO)))
                     .andReturn();
 
             String resultAsString = result.getResponse().getContentAsString();

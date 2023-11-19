@@ -9,11 +9,12 @@ import application.com.orangeteam.exceptions.travelpackage_exceptions.TravelPack
 import application.com.orangeteam.models.dtos.BookingDTO;
 import application.com.orangeteam.models.dtos.CustomerDTO;
 import application.com.orangeteam.models.entities.*;
+import application.com.orangeteam.models.enums.BookingStatus;
+import application.com.orangeteam.models.enums.PaymentStatus;
 import application.com.orangeteam.repositories.BookingRepository;
 import application.com.orangeteam.repositories.CustomerRepository;
 import application.com.orangeteam.repositories.PaymentRepository;
 import application.com.orangeteam.repositories.TravelPackageRepository;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.transaction.Transactional;
 import jakarta.validation.constraints.NotNull;
 import lombok.extern.slf4j.Slf4j;

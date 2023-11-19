@@ -1,6 +1,6 @@
 package application.com.orangeteam.models.dtos;
 
-import application.com.orangeteam.models.entities.BookingStatus;
+import application.com.orangeteam.models.enums.BookingStatus;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;

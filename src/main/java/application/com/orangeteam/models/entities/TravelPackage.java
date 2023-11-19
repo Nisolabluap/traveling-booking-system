@@ -10,6 +10,7 @@ import java.util.List;
 @Data
 @Table(name = "packages")
 public class TravelPackage {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

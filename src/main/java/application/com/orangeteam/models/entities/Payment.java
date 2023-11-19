@@ -1,5 +1,6 @@
 package application.com.orangeteam.models.entities;
 
+import application.com.orangeteam.models.enums.PaymentStatus;
 import jakarta.persistence.*;
 import lombok.Data;
 

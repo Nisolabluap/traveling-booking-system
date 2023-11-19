@@ -35,5 +35,4 @@ public interface TravelPackageRepository extends JpaRepository<TravelPackage, Lo
     List<TravelPackage> findByPricePerPersonBeforeDiscountBetweenOrderByPricePerPersonBeforeDiscountAsc(double minPrice, double maxPrice);
 
     List<TravelPackage> findByPricePerPersonBeforeDiscountBetweenOrderByPricePerPersonBeforeDiscountDesc(double minPrice, double maxPrice);
-
 }

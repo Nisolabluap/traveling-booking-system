@@ -9,6 +9,7 @@ import java.time.LocalDate;
 
 @Data
 public class TravelPackageDTO {
+
     private Long id;
 
     @NotEmpty(message = "This field must not be empty!")
@@ -38,5 +39,4 @@ public class TravelPackageDTO {
 
     @NotNull(message = "This field must not be null!")
     private LocalDate endingDate;
-
 }

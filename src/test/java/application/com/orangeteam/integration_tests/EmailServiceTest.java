@@ -4,8 +4,8 @@ import application.com.orangeteam.models.dtos.BookingDTO;
 import application.com.orangeteam.models.dtos.CustomerDTO;
 import application.com.orangeteam.models.dtos.PaymentDTO;
 import application.com.orangeteam.models.dtos.TravelPackageDTO;
-import application.com.orangeteam.models.entities.BookingStatus;
-import application.com.orangeteam.models.entities.PaymentStatus;
+import application.com.orangeteam.models.enums.BookingStatus;
+import application.com.orangeteam.models.enums.PaymentStatus;
 import application.com.orangeteam.services.EmailService;
 import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.Test;
@@ -16,6 +16,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+
 import java.time.LocalDate;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -35,14 +36,14 @@ class EmailServiceTest {
     void sendEmails() {
         TravelPackageDTO oldTravelPackageDTO = new TravelPackageDTO();
         oldTravelPackageDTO.setDestination("Here");
-        oldTravelPackageDTO.setStartingDate(LocalDate.of(2024,1,1));
-        oldTravelPackageDTO.setEndingDate(LocalDate.of(2024,2,2));
+        oldTravelPackageDTO.setStartingDate(LocalDate.of(2024, 1, 1));
+        oldTravelPackageDTO.setEndingDate(LocalDate.of(2024, 2, 2));
         oldTravelPackageDTO.setId(1L);
 
         TravelPackageDTO updatedTravelPackageDTO = new TravelPackageDTO();
         updatedTravelPackageDTO.setDestination("There");
-        updatedTravelPackageDTO.setStartingDate(LocalDate.of(2024,3,3));
-        updatedTravelPackageDTO.setEndingDate(LocalDate.of(2024,4,4));
+        updatedTravelPackageDTO.setStartingDate(LocalDate.of(2024, 3, 3));
+        updatedTravelPackageDTO.setEndingDate(LocalDate.of(2024, 4, 4));
         updatedTravelPackageDTO.setId(1L);
 
         CustomerDTO customerDTO = new CustomerDTO();

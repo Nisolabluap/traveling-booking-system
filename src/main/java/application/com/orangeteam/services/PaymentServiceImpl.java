@@ -5,6 +5,8 @@ import application.com.orangeteam.exceptions.payment_exceptions.PaymentStatusNot
 import application.com.orangeteam.models.dtos.CustomerDTO;
 import application.com.orangeteam.models.dtos.PaymentDTO;
 import application.com.orangeteam.models.entities.*;
+import application.com.orangeteam.models.enums.BookingStatus;
+import application.com.orangeteam.models.enums.PaymentStatus;
 import application.com.orangeteam.repositories.BookingRepository;
 import application.com.orangeteam.repositories.PaymentRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;

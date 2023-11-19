@@ -1,7 +1,11 @@
 package application.com.orangeteam.integration_tests;
 
 import application.com.orangeteam.models.dtos.PaymentDTO;
-import application.com.orangeteam.models.entities.*;
+import application.com.orangeteam.models.entities.Booking;
+import application.com.orangeteam.models.entities.Customer;
+import application.com.orangeteam.models.entities.TravelPackage;
+import application.com.orangeteam.models.enums.BookingStatus;
+import application.com.orangeteam.models.enums.PaymentStatus;
 import application.com.orangeteam.repositories.BookingRepository;
 import application.com.orangeteam.repositories.CustomerRepository;
 import application.com.orangeteam.repositories.TravelPackageRepository;

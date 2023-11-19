@@ -1,5 +1,6 @@
 package application.com.orangeteam.models.entities;
 
+import application.com.orangeteam.models.enums.BookingStatus;
 import jakarta.persistence.*;
 import lombok.Data;
 
@@ -11,6 +12,7 @@ import java.util.List;
 @Entity
 @Table(name = "bookings")
 public class Booking {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
