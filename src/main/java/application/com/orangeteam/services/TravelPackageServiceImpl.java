@@ -52,7 +52,6 @@ public class TravelPackageServiceImpl implements TravelPackageService {
         }
 
         TravelPackage savedPackage = travelPackageRepository.save(convertToEntity(packageDTO));
-
         TravelPackageDTO savedPackageDTO = convertToDTO(savedPackage);
         int savedDuration = calculateDuration(savedPackageDTO.getStartingDate(), savedPackageDTO.getEndingDate());
         savedPackageDTO.setDuration(savedDuration);

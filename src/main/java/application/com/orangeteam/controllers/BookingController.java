@@ -91,7 +91,7 @@ public class BookingController {
         return ResponseEntity.ok(bookingService.createBooking(bookingDTO));
     }
 
-    @PostMapping("/update-number-travelers/{id}")
+    @PutMapping("/update-number-travelers/{id}")
     @Operation(
             summary = "Update the number of travelers for a booking",
             responses = {
@@ -101,12 +101,12 @@ public class BookingController {
             }
     )
     public ResponseEntity<BookingDTO> updateNumTravelers(@Parameter(description = "ID of the booking") @PathVariable Long id,
-                                                         @RequestBody @Valid Integer numTravelers) {
+                                                         @RequestBody Integer numTravelers) {
         BookingDTO bookingResponseDTO = bookingService.updateNumTravelers(id, numTravelers);
         return ResponseEntity.ok(bookingResponseDTO);
     }
 
-    @PostMapping("/cancel-booking/{id}")
+    @PutMapping("/cancel-booking/{id}")
     @Operation(
             summary = "Cancel a booking",
             responses = {
