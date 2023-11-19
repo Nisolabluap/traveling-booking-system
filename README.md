@@ -18,7 +18,7 @@ travel agency staff and customers.
 
 ## API Reference
 
-#### Travel Package
+### Travel Package
 
 | Parameter | Type     | 
 | :-------- | :------- | 
@@ -50,7 +50,7 @@ travel agency staff and customers.
 ```
 #### Get a travel package by ID
 ```http
-  DELETE/api/travel-packages/{id}
+  GET/api/travel-packages/{id}
 ```
 #### Get Travel Packages Between Dates
 ```http
@@ -65,7 +65,7 @@ travel agency staff and customers.
   GET/api/travel-packages/by-destination
 ```
 
-#### Customer
+### Customer
 
 | Parameter | Type     | 
 | :-------- | :------- | 
@@ -128,13 +128,13 @@ GET/api/customers/{id}
 ```http
   POST/api/bookings
 ```
-#### Update NumTravelers
+#### Update the number of travelers for a booking
 ```http
-  POST/api/bookings/update-number-travelers/{id}
+  PUT/api/bookings/update-number-travelers/{id}
 ```
 #### Cancel Booking
 ```http
-  POST/api/bookings/cancel-booking/{id}
+  PUT/api/bookings/cancel-booking/{id}
 ```
 ### Payment
 
