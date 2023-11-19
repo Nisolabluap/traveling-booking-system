@@ -12,7 +12,7 @@ import io.swagger.v3.oas.annotations.servers.Server;
                 description = "Build a Travel Booking System for a travel agency. " +
                         "The agency offers various travel packages and services to customers looking to plan their vacations. " +
                         "The system should handle package bookings, payment processing, and itinerary management. " +
-                        "For more details, please refer tot the [project documentation](https://github.com/Nisolabluap/traveling-booking-system#readme).",
+                        "For more details, please refer to the [project documentation](https://github.com/Nisolabluap/traveling-booking-system#readme).",
                 contact = @Contact(
                         name = "Orange Team",
                         email = "orange@team.com",

@@ -64,6 +64,11 @@ public class TravelPackageServiceImpl implements TravelPackageService {
         if (isNotValid(packageDTO)) {
             throw new TravelPackageCreateException("Invalid dates");
         }
+
+        if (isDuplicate(packageDTO)) {
+            throw new DuplicateTravelPackageException("Duplicate travel package found");
+        }
+
         TravelPackage travelPackageOld = travelPackageRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Travel package with ID " + id + " not found"));
 
