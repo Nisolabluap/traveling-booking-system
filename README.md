@@ -6,6 +6,7 @@ Traveling Booking System is a comprehensive solution for managing travel package
 agency. This system streamlines the process of package bookings, payment processing, and itinerary management for both
 travel agency staff and customers.
 
+- [Technologies and frameworks used](#technologies-and-frameworks-used)
 - [API Reference](#api-reference)
     * [Travel Package](#api-reference)
     * [Customer](#api-reference)
@@ -15,6 +16,20 @@ travel agency staff and customers.
 - [Features](#features)
 - [Installation](#installation)
 - [Authors](#authors)
+
+ ## Technologies and Frameworks Used:
+* Java 17
+* SpringBoot 3.1.4
+* PostMan
+* Swagger
+* PostgreSQL
+* Thymeleaf
+* Lombok
+* Maven
+* Spring Data JPA
+* Hibernate
+* Jackson
+* JUnit
 
 ## API Reference
 
