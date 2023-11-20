@@ -13,6 +13,5 @@ public interface EmailService {
     void sendBookingConfirmationEmail(CustomerDTO customerDTO, BookingDTO bookingDTO);
     void sendPaymentReceiptEmail(CustomerDTO customerDTO, PaymentDTO paymentDTO);
     void sendPaymentFailedEmail(CustomerDTO customerDTO, PaymentDTO paymentDTO);
-    void sendItineraryChangeEmail(CustomerDTO customerDTO, BookingDTO bookingDTO, TravelPackageDTO oldTravelPackageDTO,
-                                  TravelPackageDTO updatedTravelPackage);
+    void sendItineraryChangeEmail(CustomerDTO customerDTO, BookingDTO bookingDTO, TravelPackageDTO oldTravelPackageDTO, TravelPackageDTO updatedTravelPackage);
 }
