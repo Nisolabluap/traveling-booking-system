@@ -35,7 +35,7 @@ public class PaymentController {
     )
     @PostMapping
     public ResponseEntity<PaymentDTO> processPayment(
-            @RequestBody @Valid PaymentDTO paymentDTO) {
+            @RequestBody PaymentDTO paymentDTO) {
         PaymentDTO paymentResponseDTO = paymentService.processPayment(
                 paymentDTO.getBankAccountInfo(),
                 paymentDTO.getBookingID());

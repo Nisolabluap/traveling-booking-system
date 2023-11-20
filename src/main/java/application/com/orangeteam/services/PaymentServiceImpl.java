@@ -24,13 +24,11 @@ public class PaymentServiceImpl implements PaymentService {
     private final BookingRepository bookingRepository;
     private final Random random = new Random();
     private final EmailService emailService;
-    private final ObjectMapper objectMapper;
 
     public PaymentServiceImpl(PaymentRepository paymentRepository, BookingRepository bookingRepository, EmailService emailService, ObjectMapper objectMapper) {
         this.paymentRepository = paymentRepository;
         this.bookingRepository = bookingRepository;
         this.emailService = emailService;
-        this.objectMapper = objectMapper;
     }
 
     public PaymentDTO processPayment(String creditCardNumber, Long bookingId) {
@@ -43,7 +41,12 @@ public class PaymentServiceImpl implements PaymentService {
         }
 
         Customer customer = booking.getCustomer();
-        CustomerDTO customerDTO = objectMapper.convertValue(customer, CustomerDTO.class);
+        CustomerDTO customerDTO = new CustomerDTO();
+        customerDTO.setId(customer.getId());
+        customerDTO.setFirstName(customer.getFirstName());
+        customerDTO.setLastName(customer.getLastName());
+        customerDTO.setPhoneNumber(customer.getPhoneNumber());
+        customerDTO.setEmail(customer.getEmail());
 
         double price = booking.getPriceTotal();
 
