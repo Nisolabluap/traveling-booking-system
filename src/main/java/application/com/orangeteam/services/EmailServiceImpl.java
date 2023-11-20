@@ -11,6 +11,7 @@ import com.mailslurp.clients.Configuration;
 import com.mailslurp.models.SendEmailOptions;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
@@ -28,12 +29,14 @@ public class EmailServiceImpl implements EmailService {
     @Autowired
     private TemplateEngine emailTemplateEngine;
 
-    public EmailServiceImpl() {
+    @Autowired
+    public EmailServiceImpl(
+            @Value("${mail.slurp.apiKey}") String mailSlurpApiKey,
+            @Value("${mail.slurp.apiInbox}") String mailSlurpInboxId) {
         this.defaultClient = Configuration.getDefaultApiClient();
-        defaultClient.setApiKey("4657e79f8cf4ed42688b6babace42947370bb361ceebb5dec1780e13d0af5b45");
-        this.inboxId = UUID.fromString("4e74bec5-9845-49b6-bc5b-c85d56ae8979");
+        defaultClient.setApiKey(mailSlurpApiKey);
+        this.inboxId = UUID.fromString(mailSlurpInboxId);
     }
-
 
     private void sendEmail(String subject, String body, String eMailAddress) {
         InboxControllerApi inboxControllerApi = new InboxControllerApi(defaultClient);
