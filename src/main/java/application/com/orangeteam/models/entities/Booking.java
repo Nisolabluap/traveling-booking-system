@@ -15,24 +15,24 @@ public class Booking {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
+    private Long id;
 
     @ManyToOne
     @JoinColumn(name = "customer_id", nullable = false)
-    Customer customer;
+    private Customer customer;
 
     @ManyToOne
     @JoinColumn(name = "travel_package_id", nullable = false)
-    TravelPackage travelPackage;
+    private TravelPackage travelPackage;
 
     @OneToMany(mappedBy = "booking")
-    List<Payment> payments = new ArrayList<>();
+    private List<Payment> payments = new ArrayList<>();
 
     @Column(name = "num_travelers")
-    int numTravelers;
+    private int numTravelers;
 
     @Column(name = "price_total")
-    private double priceTotal;
+    private double totalPrice;
 
     @Column
     private LocalDateTime createdAt;

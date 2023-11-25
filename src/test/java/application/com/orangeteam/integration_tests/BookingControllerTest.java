@@ -92,7 +92,7 @@ class BookingControllerTest {
         });
         assertEquals(BookingStatus.BOOKED, bookingResponseDTO.getBookingStatus());
         assertTrue(bookingResponseDTO.getId() > 0);
-        assertEquals(1800, bookingResponseDTO.getPriceTotal());
+        assertEquals(1800, bookingResponseDTO.getTotalPrice());
     }
 
     @Test
@@ -128,7 +128,7 @@ class BookingControllerTest {
 
         assertEquals(BookingStatus.BOOKED, bookingResponseDTO.getBookingStatus());
         assertTrue(bookingResponseDTO.getId() > 0);
-        assertEquals(1800, bookingResponseDTO.getPriceTotal());
+        assertEquals(1800, bookingResponseDTO.getTotalPrice());
     }
 
     @Test

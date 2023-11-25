@@ -66,7 +66,7 @@ class PaymentControllerTest {
         booking.setTravelPackage(travelPackage);
         booking.setCustomer(customer);
         booking.setNumTravelers(20);
-        booking.setPriceTotal(2000);
+        booking.setTotalPrice(2000);
         booking.setBookingStatus(BookingStatus.BOOKED);
         bookingRepository.save(booking);
 
@@ -87,7 +87,7 @@ class PaymentControllerTest {
         assertTrue(paymentDTOConverted.getId() > 0);
         assertTrue(paymentDTOConverted.getPaymentDateTime().isBefore(LocalDateTime.now().plusSeconds(1)));
         assertEquals(paymentDTOConverted.getBankAccountInfo(), paymentDTO.getBankAccountInfo());
-        assertEquals(paymentDTOConverted.getAmount(), booking.getPriceTotal());
+        assertEquals(paymentDTOConverted.getAmount(), booking.getTotalPrice());
         assertEquals(paymentDTOConverted.getBookingID(), paymentDTO.getBookingID());
         assertTrue(paymentDTOConverted.getPaymentStatus() == PaymentStatus.SUCCESSFUL ||
                 paymentDTOConverted.getPaymentStatus() == PaymentStatus.FAILED);
@@ -120,7 +120,7 @@ class PaymentControllerTest {
         booking.setTravelPackage(travelPackage);
         booking.setCustomer(customer);
         booking.setNumTravelers(20);
-        booking.setPriceTotal(2000);
+        booking.setTotalPrice(2000);
         booking.setBookingStatus(BookingStatus.PAID);
         bookingRepository.save(booking);
 

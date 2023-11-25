@@ -48,7 +48,7 @@ public class PaymentServiceImpl implements PaymentService {
         customerDTO.setPhoneNumber(customer.getPhoneNumber());
         customerDTO.setEmail(customer.getEmail());
 
-        double price = booking.getPriceTotal();
+        double price = booking.getTotalPrice();
 
         Payment payment = new Payment();
         payment.setPaymentDate(LocalDateTime.now());

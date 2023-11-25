@@ -8,7 +8,10 @@ import application.com.orangeteam.exceptions.customer_exceptions.CustomerNotFoun
 import application.com.orangeteam.exceptions.travelpackage_exceptions.TravelPackageNotFoundException;
 import application.com.orangeteam.models.dtos.BookingDTO;
 import application.com.orangeteam.models.dtos.CustomerDTO;
-import application.com.orangeteam.models.entities.*;
+import application.com.orangeteam.models.entities.Booking;
+import application.com.orangeteam.models.entities.Customer;
+import application.com.orangeteam.models.entities.Payment;
+import application.com.orangeteam.models.entities.TravelPackage;
 import application.com.orangeteam.models.enums.BookingStatus;
 import application.com.orangeteam.models.enums.PaymentStatus;
 import application.com.orangeteam.repositories.BookingRepository;
@@ -36,7 +39,7 @@ public class BookingServiceImpl implements BookingService {
     private final PaymentService paymentService;
     private final EmailService emailService;
 
-    public BookingServiceImpl(
+    public BookingServiceImpl (
             CustomerRepository customerRepository,
             TravelPackageRepository travelPackageRepository,
             BookingRepository bookingRepository,
@@ -56,7 +59,7 @@ public class BookingServiceImpl implements BookingService {
         if (isDuplicate(bookingDTO)) {
             throw new DuplicateBookingException("Duplicate booking detected. Use update to modify booking.");
         }
-        if (!checkIfAvailableReservations(bookingDTO.getNumTravelers(), bookingDTO.getTravelPackageID())) {
+        if (!hasAvailableReservations(bookingDTO.getNumTravelers(), bookingDTO.getTravelPackageID())) {
             throw new BookingCreateException("Number of travelers exceeds available reservations");
         }
 
@@ -79,7 +82,7 @@ public class BookingServiceImpl implements BookingService {
         booking.setCustomer(customer);
         booking.setTravelPackage(travelPackage);
         booking.setNumTravelers(bookingDTO.getNumTravelers());
-        booking.setPriceTotal(priceTotal);
+        booking.setTotalPrice(priceTotal);
         booking.setBookingStatus(BookingStatus.BOOKED);
         booking.setCreatedAt(LocalDateTime.now());
         Booking bookingEntity = bookingRepository.save(booking);
@@ -144,7 +147,7 @@ public class BookingServiceImpl implements BookingService {
         }
         int travelersModifier = numTravelers - bookingToBeUpdated.getNumTravelers();
         if (travelersModifier > 0) {
-            if (checkIfAvailableReservations(travelersModifier, travelPackage.getId())) {
+            if (hasAvailableReservations(travelersModifier, travelPackage.getId())) {
                 bookingToBeUpdated.setNumTravelers(numTravelers);
             } else {
                 throw new BookingCreateException("Number of travelers exceeds available reservations");
@@ -155,7 +158,7 @@ public class BookingServiceImpl implements BookingService {
         travelPackageRepository.save(travelPackage);
 
         bookingToBeUpdated.setNumTravelers(numTravelers);
-        bookingToBeUpdated.setPriceTotal(calculateTotal(numTravelers,
+        bookingToBeUpdated.setTotalPrice(calculateTotal(numTravelers,
                 travelPackage.getPricePerPersonBeforeDiscount(),
                 travelPackage.getDiscountPercent()));
         Booking updatedBooking = bookingRepository.save(bookingToBeUpdated);
@@ -191,7 +194,7 @@ public class BookingServiceImpl implements BookingService {
         return convertToDTO(canceledBooking);
     }
 
-    private boolean checkIfAvailableReservations(int numTravelers, Long travelPackageId) {
+    private boolean hasAvailableReservations(int numTravelers, Long travelPackageId) {
         TravelPackage travelPackage = travelPackageRepository.getReferenceById(travelPackageId);
         return numTravelers <= travelPackage.getAvailableReservations();
     }
@@ -202,7 +205,7 @@ public class BookingServiceImpl implements BookingService {
         bookingDTO.setCustomerID(booking.getCustomer().getId());
         bookingDTO.setTravelPackageID(booking.getTravelPackage().getId());
         bookingDTO.setNumTravelers(booking.getNumTravelers());
-        bookingDTO.setPriceTotal(booking.getPriceTotal());
+        bookingDTO.setTotalPrice(booking.getTotalPrice());
         bookingDTO.setBookingStatus(booking.getBookingStatus());
         return bookingDTO;
     }

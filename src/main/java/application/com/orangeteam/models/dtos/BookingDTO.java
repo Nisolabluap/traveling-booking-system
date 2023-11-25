@@ -8,19 +8,19 @@ import lombok.Data;
 @Data
 public class BookingDTO {
 
-    private long id;
+    private Long id;
 
     @NotNull
-    private long customerID;
+    private Long customerID;
 
     @NotNull
-    private long travelPackageID;
+    private Long travelPackageID;
 
     @NotNull
     @Min(value = 1, message = "Cannot create booking for less than one traveler.")
     private int numTravelers;
 
-    private double priceTotal;
+    private double totalPrice;
 
     private BookingStatus bookingStatus;
 }
